@@ -30,7 +30,8 @@
                 <input type="number" name="rating" min="0" max="5" class="w-full border rounded p-2">
             </div>
 
-            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">Создать</button>
+{{--            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">Создать</button>--}}
+            <x-success-button type="submit">Создать</x-success-button>
         </form>
     </div>
 </x-app-layout>

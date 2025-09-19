@@ -3,8 +3,13 @@
         <h2 class="text-xl font-semibold">Посты</h2>
     </x-slot>
 
-    <div class="py-6 max-w-4xl mx-auto">
-        <a href="{{ route('posts.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded">Создать пост</a>
+    <div class="py-12">
+    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+
+            <div class="flex flex-wrap gap-4">
+                <x-link-button href="{{ route('posts.create') }}" >New post</x-link-button>
+            </div>
+
 
         <div class="mt-6 space-y-4">
             @foreach($posts as $post)
@@ -29,5 +34,6 @@
         <div class="mt-4">
             {{ $posts->links() }}
         </div>
+    </div>
     </div>
 </x-app-layout>

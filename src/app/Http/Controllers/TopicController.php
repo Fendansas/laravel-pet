@@ -31,4 +31,24 @@ class TopicController extends Controller
 
         return redirect()->route('topics.index')->with('success', 'Тема создана!');
     }
+
+    public function edit(Topic $topic){
+        return view('topics.edit', compact('topic'));
+    }
+    public function update(Request $request, Topic $topic){
+        $data = $request->validate([
+            'name' => 'required|string|max:100|unique:topics,name' . $topic->id,
+        ]);
+
+        $data['slug'] = Str::slug($data['name']);
+
+        $topic->update($data);
+        return redirect()->route('topics.index')->with('success', 'Тема обновлена');
+    }
+
+    public function destroy(Topic $topic){
+        $topic->delete();
+
+        return redirect()->route('topics.index')->with('success', 'Тема удалена');
+    }
 }
