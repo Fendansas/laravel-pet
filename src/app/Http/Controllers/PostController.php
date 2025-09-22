@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\PostRating;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Topic;
@@ -23,7 +24,6 @@ class PostController extends Controller
         $data = $request->validate([
            'title' => 'required|string|max:255',
            'content' => 'required|string',
-           'rating' => 'nullable|integer:|min:0|max:5',
         ]);
 
         $data['user_id'] = Auth::id();
@@ -38,9 +38,8 @@ class PostController extends Controller
     }
 
     public function edit(Post $post){
-//        if(Auth::id() != $post->id && !Auth::user()->hasRole('admin')){
-//            abort(403, 'У вас нет прав для редактирования.');
-//        }
+
+        $this->authorize('update', $post);
 
         $topics = Topic::all();
         return view('posts.edit', compact('post', 'topics'));
@@ -53,7 +52,6 @@ class PostController extends Controller
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'rating' => 'nullable|integer|min:0|max:5',
             'topic_id' => 'nullable|exists:topics,id',
         ]);
         $post->update($data);
@@ -65,6 +63,19 @@ class PostController extends Controller
             abort(403, 'У вас нет прав для удаления.');
         }
         return redirect()->route('posts.index')->with('success', 'Пост успешно удалён.');
+    }
+
+    public function rate(Request $request, Post $post){
+        $data = $request->validate([
+            'rating' => 'nullable|integer:min:0|max:5',
+        ]);
+
+        PostRating::updateOrCreate(
+            ['post_id' => $post->id, 'user_id' => Auth::id()],
+            ['rating' => $data['rating']]
+        );
+
+        return back()->with('success', 'Вы оценили пост');
     }
 
 

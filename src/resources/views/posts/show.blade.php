@@ -8,7 +8,24 @@
         <p>{{ $post->content }}</p>
         <p><strong>Автор:</strong> {{ $post->user->name }}</p>
         <p><strong>Тема:</strong> {{ $post->topic->name ?? 'Без темы' }}</p>
-        <p><strong>Рейтинг:</strong> {{ $post->rating ?? '—' }}</p>
+        <p><strong>Средний рейтинг:</strong> {{ number_format($post->averageRating(), 1) ?? '—' }}</p>
+
+        @auth
+            @if(!$post->userRating(Auth::id()))
+                <form action="{{ route('posts.rate', $post) }}" method="POST">
+                    @csrf
+                    <div class="star-rating">
+                        @for($i = 5; $i >= 0; $i--)
+                            <input type="radio" id="star{{ $i }}" name="rating" value="{{ $i }}" />
+                            <label for="star{{ $i }}">{{ $i }}★</label>
+                        @endfor
+                    </div>
+                    <x-success-button type="submit" class="mt-2">Оценить</x-success-button>
+                </form>
+            @else
+                <p>Вы уже поставили оценку: {{ $post->userRating(Auth::id())->rating }} ⭐</p>
+            @endif
+        @endauth
 
         @if(Auth::id() === $post->user_id || Auth::user()->hasRole('admin'))
             <x-link-button href="{{ route('posts.edit', $post) }}">Редактировать</x-link-button>

@@ -65,5 +65,8 @@ Route::middleware('auth')->group(function () {
     })->name('components.index');
 });
 
+Route::post('/posts/{post}/rate', [PostController::class, 'rate'])->name('posts.rate')->middleware('auth');
+
+
 
 require __DIR__.'/auth.php';

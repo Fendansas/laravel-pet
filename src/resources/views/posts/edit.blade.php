@@ -26,12 +26,6 @@
                 <textarea name="content" class="w-full border rounded p-2" rows="5" required>{{ old('content', $post->content) }}</textarea>
             </div>
 
-            <div class="mb-4">
-                <label class="block font-semibold">Рейтинг (0–5)</label>
-                <input type="number" name="rating" value="{{ old('rating', $post->rating) }}" class="form-control" min="0" max="5">
-            </div>
-
-            {{--            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">Создать</button>--}}
             <x-success-button type="submit">Обновить</x-success-button>
         </form>
     </div>

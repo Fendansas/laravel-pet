@@ -23,4 +23,15 @@ class Post extends Model
     public function topic(){
         return $this->belongsTo(Topic::class);
     }
+
+    public function ratings(){
+        return $this->hasMany(PostRating::class);
+    }
+
+    public function averageRating(){
+        return $this->ratings()->avg('rating');
+    }
+    public function userRating($userId){
+        return $this->ratings()->where('user_id', $userId)->first();
+    }
 }
