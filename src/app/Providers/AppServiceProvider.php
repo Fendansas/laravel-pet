@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\Post;
+use App\Policies\PostPolicy;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Login;
@@ -36,5 +39,7 @@ class AppServiceProvider extends ServiceProvider
                 $user->save();
             }
         });
+
+        Gate::policy(Post::class, PostPolicy::class);
     }
 }

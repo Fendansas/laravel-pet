@@ -14,7 +14,7 @@
         <div class="mt-6 space-y-4">
             @foreach($posts as $post)
                 <div class="p-4 border rounded shadow">
-                    <h3 class="text-lg font-bold">{{ $post->title }}</h3>
+                    <h3 class="text-lg font-bold"><a href="{{ route('posts.show', $post) }}">{{ $post->title }}</a></h3>
                     <p class="text-gray-700">{{ Str::limit($post->content, 150) }}</p>
                     <p class="text-sm text-gray-500">
                         Автор: {{ $post->user->name }} | Рейтинг: {{ $post->rating }}
