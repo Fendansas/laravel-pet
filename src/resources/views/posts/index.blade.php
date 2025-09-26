@@ -9,6 +9,18 @@
             <div class="flex flex-wrap gap-4">
                 <x-link-button href="{{ route('posts.create') }}" >New post</x-link-button>
             </div>
+        <div class="mb-4">
+            <form method="GET" action="{{ route('posts.index') }}">
+                <select name="topic_id" onchange="this.form.submit()" class="border rounded p-2" style="width: 300px">
+                    <option value="">Все темы</option>
+                    @foreach($topics as $topic)
+                        <option value="{{ $topic->id }}" {{ request('topic_id') == $topic->id ? 'selected' : '' }}>
+                            {{ $topic->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </form>
+        </div>
 
 
         <div class="mt-6 space-y-4">

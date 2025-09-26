@@ -11,9 +11,18 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 class PostController extends Controller
 {
     use AuthorizesRequests;
-    public function index(){
-        $posts = Post::with('user', 'topic')->latest()->paginate(10);
-        return view('posts.index', compact('posts'));
+    public function index(Request $request){
+
+        $topics = Topic::all();
+        $query = Post::with('user', 'topic');
+
+        if($request->filled('topic_id')){
+            $query->where('topic_id', $request->topic_id);
+        }
+
+
+        $posts = $query->latest()->paginate(10)->withQueryString();
+        return view('posts.index', compact('posts', 'topics'));
     }
 
     public function create(){
@@ -22,8 +31,9 @@ class PostController extends Controller
     }
     public function store(Request $request){
         $data = $request->validate([
-           'title' => 'required|string|max:255',
-           'content' => 'required|string',
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+            'topic_id' => 'required|exists:topics,id',
         ]);
 
         $data['user_id'] = Auth::id();
