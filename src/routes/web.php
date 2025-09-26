@@ -32,11 +32,20 @@ Route::middleware(['auth'])
     ->prefix('admin')
     ->group(function () {
         Route::get('/users', [UserController::class, 'index'])
-            ->middleware(RoleMiddleware::class . ':admin,manager')
+            ->can('viewAny-user', \App\Models\User::class)
             ->name('admin.users.index');
-        Route::get('/users/{id}', [UserController::class, 'show'])
-            ->middleware(RoleMiddleware::class . ':admin,manager')
+
+        Route::get('/users/{user}', [UserController::class, 'show'])
+            ->can('view-user', 'user')
             ->name('admin.users.show');
+
+//        Route::get('/users/{user}/edit', [UserController::class, 'edit'])
+//            ->can('update-user', 'user')
+//            ->name('admin.users.edit');
+
+//        Route::delete('/users/{user}', [UserController::class, 'destroy'])
+//            ->can('delete-user', 'user')
+//            ->name('admin.users.destroy');
     });
 
 Route::middleware('auth')->group(function () {

@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Models\Post;
+use App\Models\User;
 use App\Policies\PostPolicy;
+use App\Policies\UserPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Event;
@@ -41,5 +43,24 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::policy(Post::class, PostPolicy::class);
+
+        Gate::define('viewAny-user', function (User $authUser) {
+            return $authUser->hasRole(['admin', 'manager']);
+        });
+
+        // Просмотр отдельного пользователя
+        Gate::define('view-user', function (User $authUser, User $model) {
+            return $authUser->hasRole(['admin', 'manager']);
+        });
+
+        // Редактирование (только admin)
+        Gate::define('update-user', function (User $authUser, User $model) {
+            return $authUser->hasRole('admin');
+        });
+
+        // Удаление (только admin)
+        Gate::define('delete-user', function (User $authUser, User $model) {
+            return $authUser->hasRole('admin');
+        });
     }
 }
