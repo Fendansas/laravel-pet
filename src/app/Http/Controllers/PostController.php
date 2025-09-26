@@ -15,11 +15,20 @@ class PostController extends Controller
 
         $topics = Topic::all();
         $query = Post::with('user', 'topic');
-
+        // сортировка по постам
         if($request->filled('topic_id')){
             $query->where('topic_id', $request->topic_id);
         }
 
+        // писк по потам
+        if ($request->filled('search')){
+            $search = $request->search;
+
+            $query->where(function($query) use ($search){
+                $query->where('title', 'like', "%{$search}%")
+                    ->orWhere('content', 'like', "%{$search}%");
+            });
+        }
 
         $posts = $query->latest()->paginate(10)->withQueryString();
         return view('posts.index', compact('posts', 'topics'));

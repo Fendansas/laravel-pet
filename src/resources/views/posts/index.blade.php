@@ -10,8 +10,11 @@
                 <x-link-button href="{{ route('posts.create') }}" >New post</x-link-button>
             </div>
         <div class="mb-4">
-            <form method="GET" action="{{ route('posts.index') }}">
-                <select name="topic_id" onchange="this.form.submit()" class="border rounded p-2" style="width: 300px">
+            <form method="GET" action="{{ route('posts.index') }}" class="mb-4 flex gap-2">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Поиск постов..."
+                       class="border rounded p-2 flex-1" />
+
+                <select name="topic_id" onchange="this.form.submit()" class="border rounded p-2 " style="width: 300px">
                     <option value="">Все темы</option>
                     @foreach($topics as $topic)
                         <option value="{{ $topic->id }}" {{ request('topic_id') == $topic->id ? 'selected' : '' }}>
@@ -19,8 +22,11 @@
                         </option>
                     @endforeach
                 </select>
+
+                <x-secondary-button type="submit">Найти</x-secondary-button>
             </form>
         </div>
+
 
 
         <div class="mt-6 space-y-4">
