@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TopicController;
@@ -75,6 +76,10 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::post('/posts/{post}/rate', [PostController::class, 'rate'])->name('posts.rate')->middleware('auth');
+
+
+Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
+Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 
 
 

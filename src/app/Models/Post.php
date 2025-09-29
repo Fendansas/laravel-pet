@@ -34,4 +34,8 @@ class Post extends Model
     public function userRating($userId){
         return $this->ratings()->where('user_id', $userId)->first();
     }
+
+    public function comments(){
+        return $this->hasMany(Comment::class);
+    }
 }

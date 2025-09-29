@@ -38,5 +38,31 @@
                 <x-danger-button type="submit">Удалить</x-danger-button>
             </form>
         @endif
+
+        <h3>Комментарии</h3>
+
+        @auth
+            <form action="{{ route('comments.store', $post) }}" method="POST">
+                @csrf
+                <textarea name="content" class="form-control" rows="3" placeholder="Напишите комментарий..."></textarea>
+                <button type="submit" class="btn btn-primary mt-2">Отправить</button>
+            </form>
+        @endauth
+
+        @foreach($post->comments()->latest()->get() as $comment)
+            <div class="border p-2 mt-2">
+                <strong>{{ $comment->user->name }}</strong>
+                <small class="text-muted">{{ $comment->created_at->diffForHumans() }}</small>
+                <p>{{ $comment->content }}</p>
+
+                @if(Auth::id() === $comment->user_id || Auth::user()?->hasRole('admin'))
+                    <form action="{{ route('comments.destroy', $comment) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button class="btn btn-danger btn-sm">Удалить</button>
+                    </form>
+                @endif
+            </div>
+        @endforeach
     </div>
 </x-app-layout>
