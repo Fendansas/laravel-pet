@@ -44,8 +44,10 @@
         @auth
             <form action="{{ route('comments.store', $post) }}" method="POST">
                 @csrf
-                <textarea name="content" class="form-control" rows="3" placeholder="Напишите комментарий..."></textarea>
-                <button type="submit" class="btn btn-primary mt-2">Отправить</button>
+                <div class="mb-4">
+                    <textarea name="content" class="w-full border rounded p-2" rows="5" required></textarea>
+                    <x-success-button type="submit" class="mt-2">Отправить</x-success-button>
+                </div>
             </form>
         @endauth
 
@@ -56,10 +58,10 @@
                 <p>{{ $comment->content }}</p>
 
                 @if(Auth::id() === $comment->user_id || Auth::user()?->hasRole('admin'))
-                    <form action="{{ route('comments.destroy', $comment) }}" method="POST">
+                    <form action="{{ route('comments.destroy', $comment) }}" method="POST" onsubmit="return confirm('Вы уверены, что хотите удалить этот комментарий?')">
                         @csrf
                         @method('DELETE')
-                        <button class="btn btn-danger btn-sm">Удалить</button>
+                        <x-danger-button>Удалить</x-danger-button>
                     </form>
                 @endif
             </div>
