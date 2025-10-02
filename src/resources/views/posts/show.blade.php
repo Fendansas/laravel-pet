@@ -50,21 +50,9 @@
                 </div>
             </form>
         @endauth
-
-        @foreach($post->comments()->latest()->get() as $comment)
-            <div class="border p-2 mt-2">
-                <strong>{{ $comment->user->name }}</strong>
-                <small class="text-muted">{{ $comment->created_at->diffForHumans() }}</small>
-                <p>{{ $comment->content }}</p>
-
-                @if(Auth::id() === $comment->user_id || Auth::user()?->hasRole('admin'))
-                    <form action="{{ route('comments.destroy', $comment) }}" method="POST" onsubmit="return confirm('Вы уверены, что хотите удалить этот комментарий?')">
-                        @csrf
-                        @method('DELETE')
-                        <x-danger-button>Удалить</x-danger-button>
-                    </form>
-                @endif
-            </div>
+        @foreach($post->comments()->whereNull('parent_id')->latest()->with('replies')->get() as $comment)
+            <x-comment :comment="$comment" :level="0" />
         @endforeach
+
     </div>
 </x-app-layout>

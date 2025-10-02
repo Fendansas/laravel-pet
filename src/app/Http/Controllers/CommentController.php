@@ -11,10 +11,12 @@ class CommentController extends Controller
     public function store(Request $request, Post $post){
         $data = $request->validate([
             'content' => 'required|string|max:255',
+            'parent_id' => 'nullable|exists:comments,id',
         ]);
         $post->comments()->create([
             'content' => $data['content'],
             'user_id' => auth()->id(),
+            'parent_id' => $data['parent_id'] ?? null,
             ]);
 
         return back()->with('success','Comment added');
