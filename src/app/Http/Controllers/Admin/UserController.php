@@ -68,9 +68,13 @@ class UserController extends Controller
 
         $user->load('profile'); // подгрузим профиль через Eloquent
 
+        $postsCount = $user->posts()->count();
+
+        $commentsCount = $user->comments()->count();
+
         $this->authorize('view-user', $user); // проверка прав
 
-        return view('admin.users.show', compact('user'));
+        return view('admin.users.show', compact('user', 'postsCount', 'commentsCount'));
 
     }
 

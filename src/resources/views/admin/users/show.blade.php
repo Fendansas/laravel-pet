@@ -25,6 +25,9 @@
                     <p><strong>Страна:</strong> {{ $user->profile->country ?? '-' }}</p>
                     <p><strong>Язык:</strong> {{ $user->profile->language ?? '-' }}</p>
                     <p><strong>Статус:</strong> {{ $user->profile->status_message ?? '-' }}</p>
+                    <p><strong>Количество постов:</strong> {{ $postsCount }}</p>
+                    <p><strong>Количество комментариев:</strong> {{ $commentsCount }}</p>
+
                 </div>
             </div>
         </div>
