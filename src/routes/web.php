@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\FollowController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TopicController;
@@ -27,6 +28,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/user-profile', [UserProfileController::class, 'edit'])->name('user-profile.edit');
     Route::post('/user-profile', [UserProfileController::class, 'store'])->name('user-profile.store');
     Route::put('/user-profile', [UserProfileController::class, 'update'])->name('user-profile.update');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/follow/{user}', [FollowController::class, 'follow'])->name('follow');
+    Route::delete('/unfollow/{user}', [FollowController::class, 'unfollow'])->name('unfollow');
 });
 
 Route::middleware(['auth'])
