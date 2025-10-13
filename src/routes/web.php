@@ -31,6 +31,11 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/users', [UserProfileController::class, 'index'])->name('users.index');
+    Route::get('/users/{user}', [UserProfileController::class, 'show'])->name('users.show');
+});
+
+Route::middleware(['auth'])->group(function () {
     Route::post('/follow/{user}', [FollowController::class, 'follow'])->name('follow');
     Route::delete('/unfollow/{user}', [FollowController::class, 'unfollow'])->name('unfollow');
 });

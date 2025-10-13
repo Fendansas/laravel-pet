@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\UserProfile;
 use Illuminate\Support\Facades\Auth;
@@ -78,5 +79,42 @@ class UserProfileController extends Controller
         $profile->update($data);
 
         return redirect()->route('user-profile.edit')->with('success', 'Профиль обновлен');
+    }
+
+    public function index(Request $request){
+
+        $query = User::with('profile')
+            ->select('id', 'name');
+
+        if ($request->filled('name')) {
+            $query->where('name', 'like', '%'.$request->name.'%');
+        }
+
+        if ($request->filled('country')) {
+            $query->whereHas('profile', function ($q) use ($request) {
+                $q->where('country', 'like', '%'.$request->country.'%');
+            });
+        }
+
+        if ($request->filled('city')) {
+            $query->whereHas('profile', function ($q) use ($request) {
+                $q->where('city', 'like', '%'.$request->city.'%');
+            });
+        }
+
+        $users = $query->paginate(15)->withQueryString();
+
+        return view('user-profile.index', compact('users'));
+
+    }
+
+    public function show(User $user){
+        $user->load('profile');
+
+        $postsCount = $user->posts()->count();
+
+        $commentsCount = $user->comments()->count();
+
+        return view('user-profile.show', compact('user', 'postsCount', 'commentsCount'));
     }
 }

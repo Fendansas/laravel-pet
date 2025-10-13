@@ -18,9 +18,12 @@
                 </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.index')">
-                        {{ __('Users') }}
+                        {{ __('Users for admin') }}
                     </x-nav-link>
                 </div>
+                <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
+                    {{ __('Users') }}
+                </x-nav-link>
                 <x-nav-link :href="route('topics.index')" :active="request()->routeIs('topics.index')">
                     {{ __('Темы') }}
                 </x-nav-link>
