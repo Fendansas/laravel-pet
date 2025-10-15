@@ -25,17 +25,28 @@
                     <p><strong>Количество постов:</strong> {{ $postsCount }}</p>
                     <p><strong>Количество комментариев:</strong> {{ $commentsCount }}</p>
 
+                    <p>
+                        <a href="{{ route('user.followers', $user) }}" class="text-blue-500 hover:underline">
+                            Подписчики: {{ $user->followers()->count() }}
+                        </a>
+                    </p>
+                    <p>
+                        <a href="{{ route('user.following', $user) }}" class="text-blue-500 hover:underline">
+                            Подписки: {{ $user->followings()->count() }}
+                        </a>
+                    </p>
+
                     @if(Auth::check() && Auth::id() !== $user->id)
                         @if(Auth::user()->isFollowing($user))
                             <form action="{{ route('unfollow', $user) }}" method="POST">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-secondary">Отписаться</button>
+                                <x-success-button type="submit" class="btn btn-secondary">Отписаться</x-success-button>
                             </form>
                         @else
                             <form action="{{ route('follow', $user) }}" method="POST">
                                 @csrf
-                                <button type="submit" class="btn btn-primary">Подписаться</button>
+                                <x-warning-button type="submit" class="btn btn-primary">Подписаться</x-warning-button>
                             </form>
                         @endif
                     @endif

@@ -35,14 +35,11 @@
                     <h3 class="text-lg font-bold"><a href="{{ route('posts.show', $post) }}">{{ $post->title }}</a></h3>
                     <p class="text-gray-700">{{ Str::limit($post->content, 150) }}</p>
                     <p class="text-sm text-gray-500">
-                        Автор: {{ $post->user->name }} | Рейтинг: {{ $post->rating }}
-                    </p>
-                    <p class="text-sm text-gray-500">
                         Автор: {{ $post->user->name }}
                         @if($post->topic)
                             | Тема: {{ $post->topic->name }}
                         @endif
-                        | Рейтинг: {{ $post->rating }}
+                        | Рейтинг: {{ number_format($post->averageRating(), 1) ?? '—' }}
                     </p>
 
                 </div>

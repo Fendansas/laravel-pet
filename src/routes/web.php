@@ -28,7 +28,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/user-profile', [UserProfileController::class, 'edit'])->name('user-profile.edit');
     Route::post('/user-profile', [UserProfileController::class, 'store'])->name('user-profile.store');
     Route::put('/user-profile', [UserProfileController::class, 'update'])->name('user-profile.update');
+
+    Route::get('/users/{user}/followers', [FollowController::class, 'followers'])->name('user.followers');
+    Route::get('/users/{user}/following', [FollowController::class, 'following'])->name('user.following');
+
 });
+
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/users', [UserProfileController::class, 'index'])->name('users.index');

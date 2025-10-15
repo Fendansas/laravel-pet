@@ -32,4 +32,14 @@ class FollowController extends Controller
 
         return back()->with('success', 'Subscription canceled');
     }
+
+    public function followers(User $user){
+        $followers = $user->followers()->with('profile')->paginate(15);
+        return view('user-profile.followers', compact('followers', 'user'));
+    }
+
+    public function following(User $user){
+        $followings = $user->followings()->with('profile')->paginate(15);
+        return view('user-profile.following', compact('followings','user'));
+    }
 }
