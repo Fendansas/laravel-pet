@@ -4,8 +4,10 @@ namespace App\Providers;
 
 use App\Models\Post;
 use App\Models\User;
+use App\Models\UserPhoto;
 use App\Policies\PostPolicy;
 use App\Policies\UserPolicy;
+use App\Policies\UserPhotoPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Event;
@@ -26,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::policy(UserPhoto::class, UserPhotoPolicy::class);
+
         Event::listen(Login::class, function ($event) {
             $user = $event->user;
             $user->last_login_at = now();
@@ -62,5 +66,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('delete-user', function (User $authUser, User $model) {
             return $authUser->hasRole('admin');
         });
+
+
     }
 }

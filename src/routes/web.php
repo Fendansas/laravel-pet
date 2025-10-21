@@ -6,6 +6,7 @@ use App\Http\Controllers\FollowController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TopicController;
+use App\Http\Controllers\UserPhotoController;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserProfileController;
@@ -97,6 +98,11 @@ Route::post('/posts/{post}/rate', [PostController::class, 'rate'])->name('posts.
 Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name('comments.store');
 Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 
+Route::middleware('auth')->group(function () {
+    Route::get('/my-photos', [UserPhotoController::class, 'index'])->name('user-photos.index');
+    Route::post('/my-photos', [UserPhotoController::class, 'store'])->name('user-photos.store');
+    Route::delete('/my-photos/{userPhoto}', [UserPhotoController::class, 'destroy'])->name('user-photos.destroy');
+});
 
 
 require __DIR__.'/auth.php';

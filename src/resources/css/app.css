@@ -25,3 +25,6 @@
 .star-rating label:hover ~ label {
     color: #facc15; /* жёлтый */
 }
+.photo-size{
+    width: 300px;
+}

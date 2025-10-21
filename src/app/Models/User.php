@@ -88,4 +88,8 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->followings()->where('users.id', $user->id)->exists();
     }
 
+    public function photos(){
+        return $this->hasMany(UserPhoto::class);
+    }
+
 }
