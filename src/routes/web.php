@@ -99,9 +99,10 @@ Route::post('/posts/{post}/comments', [CommentController::class, 'store'])->name
 Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/my-photos', [UserPhotoController::class, 'index'])->name('user-photos.index');
-    Route::post('/my-photos', [UserPhotoController::class, 'store'])->name('user-photos.store');
-    Route::delete('/my-photos/{userPhoto}', [UserPhotoController::class, 'destroy'])->name('user-photos.destroy');
+    Route::get('/photos', [UserPhotoController::class, 'index'])->name('user-photos.index');
+    Route::post('/photos', [UserPhotoController::class, 'store'])->name('user-photos.store');
+    Route::delete('/photos/{userPhoto}', [UserPhotoController::class, 'destroy'])->name('user-photos.destroy');
+    Route::get('/photos/{user}', [UserPhotoController::class, 'show'])->name('user-photos.show');
 });
 
 

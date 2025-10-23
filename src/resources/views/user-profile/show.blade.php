@@ -35,6 +35,11 @@
                             Подписки: {{ $user->followings()->count() }}
                         </a>
                     </p>
+                    <p>
+                        <a href="{{ route('user-photos.show', $user) }}" class="text-blue-500 hover:underline">
+                            Фото пользователя  {{ $user->name }}
+                        </a>
+                    </p>
 
                     @if(Auth::check() && Auth::id() !== $user->id)
                         @if(Auth::user()->isFollowing($user))

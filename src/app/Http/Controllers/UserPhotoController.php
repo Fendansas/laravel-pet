@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\UserPhoto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -11,7 +12,6 @@ class UserPhotoController extends Controller
 {
     use AuthorizesRequests;
     public function index(){
-
         $photos = auth()->user()->photos()->latest()->get();
         return view('user-photos.index', compact('photos'));
     }
@@ -37,5 +37,9 @@ class UserPhotoController extends Controller
         $userPhoto->delete(); // удадяем запись с базы данных
 
         return redirect()->back()->with('success', 'Photos successfully deleted');
+    }
+    public function show(User $user){
+        $photos = $user->photos()->latest()->get();
+        return view('user-photos.show', compact('photos', 'user'));
     }
 }
