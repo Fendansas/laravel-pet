@@ -14,7 +14,7 @@ class PostController extends Controller
     public function index(Request $request){
 
         $topics = Topic::all();
-        $query = Post::with('user', 'topic');
+        $query = Post::with('user', 'topic')->published();
         // сортировка по постам
         if($request->filled('topic_id')){
             $query->where('topic_id', $request->topic_id);
@@ -43,6 +43,8 @@ class PostController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'topic_id' => 'required|exists:topics,id',
+            'status' => 'required|in:draft,published',
+            'published_at' => 'nullable|date|after_or_equal:now',
         ]);
 
         $data['user_id'] = Auth::id();
@@ -72,8 +74,11 @@ class PostController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'topic_id' => 'nullable|exists:topics,id',
+            'status' => 'required|in:draft,published',
+            'published_at' => 'nullable|date|after_or_equal:now',
         ]);
         $post->update($data);
+
         return redirect()->route('posts.show', $post)->with('success', 'Post updated successfully.');
     }
 

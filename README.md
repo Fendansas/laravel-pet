@@ -124,3 +124,16 @@ docker compose run --rm artisan migrate
 docker compose run --rm artisan db:seed
 docker compose run --rm artisan tinker
 ```
+
+- для запуска работы расписания нужно запустить команду лшкально:
+
+```bash
+docker compose run --rm artisan schedule:work
+```
+- Для продакшена (через cron):
+
+```bash
+crontab -e
+* * * * * cd /path/to/your/project && php artisan schedule:run >> /dev/null 2>&1
+
+```

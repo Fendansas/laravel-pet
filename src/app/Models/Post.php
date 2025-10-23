@@ -14,6 +14,12 @@ class Post extends Model
         'title',
         'content',
         'rating',
+        'status',
+        'published_at',
+    ];
+
+    protected $casts = [
+        'published_at' => 'datetime',
     ];
 
     public function user(){
@@ -37,5 +43,13 @@ class Post extends Model
 
     public function comments(){
         return $this->hasMany(Comment::class);
+    }
+
+    public function scopePublished($query){
+        return $query->where('status', 'published')
+            ->where(function($q){
+                $q->whereNull('published_at')
+                    ->orWhere('published_at', '<=', now());
+            });
     }
 }
