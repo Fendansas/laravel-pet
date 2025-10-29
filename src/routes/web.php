@@ -5,11 +5,13 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StripeController;
 use App\Http\Controllers\TopicController;
 use App\Http\Controllers\UserPhotoController;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserProfileController;
+use Stripe\Stripe;
 
 Route::get('/', function () {
     return view('welcome');
@@ -104,6 +106,33 @@ Route::middleware('auth')->group(function () {
     Route::delete('/photos/{userPhoto}', [UserPhotoController::class, 'destroy'])->name('user-photos.destroy');
     Route::get('/photos/{user}', [UserPhotoController::class, 'show'])->name('user-photos.show');
 });
+
+
+Route::get('/deposit', [ProfileController::class, 'deposit'])
+    ->middleware('auth')
+    ->name('deposit');
+
+Route::get('/stripe-test', function () {
+    Stripe::setApiKey(config('services.stripe.secret'));
+
+    $paymentIntent = \Stripe\PaymentIntent::create([
+        'amount' => 1000, // сумма в центах, т.е. $10.00
+        'currency' => 'usd',
+        'description' => 'Тестовый платеж через Stripe',
+        'payment_method_types' => ['card'],
+    ]);
+
+    return response()->json($paymentIntent);
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/stripe/create-payment-intent', [StripeController::class, 'createPaymentIntent']);
+});
+
+Route::get('/payments', [\App\Http\Controllers\PaymentController::class, 'index'])
+    ->middleware(['auth'])
+    ->name('payments.index');
+
 
 
 require __DIR__.'/auth.php';

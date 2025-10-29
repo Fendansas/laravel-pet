@@ -66,6 +66,12 @@
                         <x-dropdown-link :href="route('user-profile.edit')">
                             {{ __('User Profile') }}
                         </x-dropdown-link>
+                        <x-dropdown-link :href="route('deposit')">
+                            {{ __('Deposit') }}
+                        </x-dropdown-link>
+                        <x-dropdown-link :href="route('payments.index')">
+                            {{ __('Payments') }}
+                        </x-dropdown-link>
 
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">

@@ -57,4 +57,10 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
+    public function deposit()
+    {
+        $balance = auth()->user()->balance;
+        return view('profile.deposit', compact('balance'));
+    }
 }

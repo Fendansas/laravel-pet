@@ -31,6 +31,7 @@
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{!! sortLink('last_login_at', 'Последний вход') !!}</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{!! sortLink('country', 'Страна') !!}</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">{!! sortLink('city', 'Город') !!}</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Balance</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Язык</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Действия</th>
                         </tr>
@@ -45,6 +46,7 @@
                                 <td></td>
                                 <td><input type="text" name="country" value="{{ request('country') }}" class="w-full border rounded p-1"></td>
                                 <td><input type="text" name="city" value="{{ request('city') }}" class="w-full border rounded p-1"></td>
+                                <td></td>
                                 <td><input type="text" name="language" value="{{ request('language') }}" class="w-full border rounded p-1" ></td>
                                 <td>
                                     <button type="submit" class="px-2 py-1 bg-blue-500 text-white rounded">🔍</button>
@@ -66,6 +68,7 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $user->last_login_at?->format('d.m.Y H:i') ?? '-' }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $user->profile->country ?? '-' }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $user->profile->city ?? '-' }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $user->balance ?? '-' }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $user->profile->language ?? '-' }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                     <x-link-button href="{{ route('admin.users.show', $user->id) }}">show</x-link-button>
