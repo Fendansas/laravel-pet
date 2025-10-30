@@ -1,85 +1,118 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Список пользователей') }}
+            {{ __('Лента новостей') }}
         </h2>
     </x-slot>
 
     <div class="py-10">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- Поиск -->
-            <div class="mb-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-                <form method="GET" action="{{ route('users.index') }}" class="flex flex-wrap gap-2 w-full sm:w-auto">
-                    <input
-                        type="text"
-                        name="name"
-                        value="{{ request('name') }}"
-                        placeholder="Поиск по имени..."
-                        class="border rounded-lg p-2 w-full sm:w-64 focus:ring-2 focus:ring-blue-400"
-                    >
-                    <input
-                        type="text"
-                        name="city"
-                        value="{{ request('city') }}"
-                        placeholder="Город"
-                        class="border rounded-lg p-2 w-full sm:w-48 focus:ring-2 focus:ring-blue-400"
-                    >
-                    <input
-                        type="text"
-                        name="country"
-                        value="{{ request('country') }}"
-                        placeholder="Страна"
-                        class="border rounded-lg p-2 w-full sm:w-48 focus:ring-2 focus:ring-blue-400"
-                    >
-                    <button
-                        type="submit"
-                        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-                    >
-                        🔍 Найти
-                    </button>
-                </form>
+            <!-- Основное изменение здесь: на мобильных grid-cols-1 (вертикально), на больших экранах grid-cols-12 (горизонтально) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-                @if(request()->hasAny(['name','city','country']))
-                    <a href="{{ route('users.index') }}" class="text-sm text-gray-500 hover:underline">Сбросить фильтры</a>
-                @endif
-            </div>
+                <!-- Левая колонка (меню) - на мобильных первая, на десктопе слева -->
+                <aside class="lg:col-span-3 order-1 lg:order-1">
+                    <div class="bg-white shadow-md rounded-2xl p-4">
+                        <nav class="space-y-2">
+                            <a href="{{ route('posts.index') }}" class="block p-2 rounded-lg hover:bg-gray-100 font-medium">
+                                📰 Новости
+                            </a>
+                            <a href="{{ route('user-profile.edit') }}" class="block p-2 rounded-lg hover:bg-gray-100 font-medium">
+                                👤 Мой профиль
+                            </a>
+                            <a href="{{ route('users.index') }}" class="block p-2 rounded-lg hover:bg-gray-100 font-medium">
+                                👥 Пользователи
+                            </a>
+                            <a href="{{ route('deposit') }}" class="block p-2 rounded-lg hover:bg-gray-100 font-medium">
+                                💰 Баланс
+                            </a>
+                            <a href="{{ route('profile.edit') }}" class="block p-2 rounded-lg hover:bg-gray-100 font-medium">
+                                ⚙️ Настройки
+                            </a>
+                        </nav>
+                    </div>
+                </aside>
 
-            <!-- Сетка пользователей -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                @forelse($users as $user)
-                    <div class="bg-white shadow-md rounded-2xl overflow-hidden hover:shadow-lg transition">
-                        <div class="flex flex-col items-center p-6">
-                            <div class="w-[8rem] rounded-full overflow-hidden border mb-4">
-                                @if($user->profile && $user->profile->avatar)
-                                    <img src="{{ asset('storage/'.$user->profile->avatar) }}" alt="{{ $user->name }}" class="w-full h-full object-cover">
+                <!-- Центральная колонка (лента постов) - на мобильных вторая, на десктопе в центре -->
+                <main class="lg:col-span-6 space-y-6 order-3 lg:order-2">
+                    @forelse($posts as $post)
+                        <div class="bg-white shadow-md rounded-2xl overflow-hidden hover:shadow-lg transition">
+                            <div class="p-6">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-gray-900">
+                                            {{ $post->title }}
+                                        </h3>
+                                        <p class="text-sm text-gray-500">
+                                            Автор: {{ $post->user->name }}
+                                        </p>
+                                    </div>
+                                    <p class="text-xs text-gray-400">
+                                        {{ $post->created_at->diffForHumans() }}
+                                    </p>
+                                </div>
+
+                                <p class="text-gray-700 leading-relaxed">
+                                    {{ Str::limit($post->content, 200) }}
+                                </p>
+
+                                <div class="mt-4">
+                                    <x-link-button href="{{ route('posts.show', $post) }}">
+                                        Читать далее →
+                                    </x-link-button>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="bg-white shadow-md rounded-2xl p-6 text-center text-gray-500">
+                            Постов пока нет
+                        </div>
+                    @endforelse
+
+                    <div class="mt-6">
+                        {{ $posts->onEachSide(1)->links() }}
+                    </div>
+                </main>
+
+                <!-- Правая колонка (профиль + темы) - на мобильных третья, на десктопе справа -->
+                <aside class="lg:col-span-3 space-y-6 order-2 lg:order-3">
+                    <!-- Блок профиля -->
+                    <div class="bg-white shadow-md rounded-2xl p-4">
+                        <h3 class="font-semibold mb-3">Ваш профиль</h3>
+                        <div class="flex items-center gap-3">
+                            <div class="w-14 h-14 rounded-full overflow-hidden border">
+                                @if(auth()->user()->profile && auth()->user()->profile->avatar)
+                                    <img src="{{ asset('storage/'.auth()->user()->profile->avatar) }}"
+                                         alt="avatar"
+                                         class="w-full h-full object-cover">
                                 @else
-                                    <img src="{{ asset('images/default-avatar.png') }}" alt="{{ $user->name }}" class="w-full h-full object-cover">
+                                    <img src="{{ asset('images/default-avatar.png') }}"
+                                         alt="avatar"
+                                         class="w-full h-full object-cover">
                                 @endif
                             </div>
-
-                            <h3 class="text-lg font-semibold text-gray-900">{{ $user->name }}</h3>
-                            @if($user->profile)
-                                <p class="text-sm text-gray-500 mt-1">
-                                    {{ $user->profile->city ?? 'Город не указан' }},
-                                    {{ $user->profile->country ?? 'Страна не указана' }}
-                                </p>
-                            @endif
-
-                            <div class="mt-4">
-                                <x-link-button href="{{ route('users.show', $user) }}">Смотреть профиль</x-link-button>
+                            <div>
+                                <p class="font-medium text-gray-900">{{ auth()->user()->name }}</p>
+                                <p class="text-sm text-gray-500">{{ auth()->user()->email }}</p>
                             </div>
                         </div>
                     </div>
-                @empty
-                    <div class="col-span-full text-center text-gray-500 py-10">
-                        Пользователи не найдены
-                    </div>
-                @endforelse
-            </div>
 
-            <!-- Пагинация -->
-            <div class="mt-8">
-                {{ $users->onEachSide(1)->links() }}
+                    <!-- Блок популярных тем -->
+                    <div class="bg-white shadow-md rounded-2xl p-4">
+                        <h3 class="font-semibold mb-3">Популярные темы</h3>
+                        <div class="flex flex-wrap gap-2">
+                            @forelse($topics as $topic)
+                                <a href="{{ route('posts.index', ['topic_id' => $topic->id]) }}"
+                                   class="px-3 py-1 text-sm bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition">
+                                    #{{ $topic->name }}
+                                </a>
+                            @empty
+                                <p class="text-gray-500 text-sm">Темы пока не добавлены</p>
+                            @endforelse
+                        </div>
+                    </div>
+                </aside>
             </div>
         </div>
     </div>

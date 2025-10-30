@@ -102,5 +102,19 @@ class PostController extends Controller
         return back()->with('success', 'Вы оценили пост');
     }
 
+    public function dashboard (Request $request){
+        $topics = Topic::all();
+
+        $query = Post::with('user', 'topic')->published();
+
+        if($request->filled('topic_id')){
+            $query->where('topic_id', $request->topic_id);
+        }
+
+        $posts = $query->latest()->paginate(10)->withQueryString();
+
+        return view('dashboard', compact('posts', 'topics'));
+    }
+
 
 }
