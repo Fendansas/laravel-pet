@@ -56,6 +56,14 @@
                         @endif
                     @endif
 
+                    @if(auth()->id() !== $user->id) <!-- Не показывать себе -->
+                    <div class="bg-white p-6 shadow sm:rounded-lg">
+                        <a href="{{ route('chat.index', ['user_id' => $user->id]) }}" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                            Написать сообщение
+                        </a>
+                    </div>
+                    @endif
+
                 </div>
             </div>
         </div>

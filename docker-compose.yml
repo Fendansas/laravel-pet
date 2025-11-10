@@ -1,6 +1,7 @@
 version: '3.9'
 
 services:
+  # --- Основной PHP/Laravel контейнер ---
   app:
     build:
       context: .
@@ -12,10 +13,15 @@ services:
       - ./src:/var/www
     depends_on:
       - mysql
+      - reverb
     ports:
-      - "8081:8000"
-      - "5173:5173"
-
+      - "8081:8000"  # php artisan serve (если нужно)
+    command: >
+      sh -c "
+        php-fpm -D &&
+        tail -f /dev/null
+      "
+  # --- Nginx ---
   web:
     image: nginx:alpine
     container_name: laravel_web
@@ -28,6 +34,7 @@ services:
     depends_on:
       - app
 
+  # --- MySQL ---
   mysql:
     image: mysql:8.0
     container_name: laravel_mysql
@@ -42,6 +49,7 @@ services:
     volumes:
       - db_data:/var/lib/mysql
 
+  # --- phpMyAdmin ---
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: laravel_phpmyadmin
@@ -55,14 +63,16 @@ services:
     depends_on:
       - mysql
 
+  # --- Почтовый сервис (Mailpit) ---
   mailpit:
     image: axllent/mailpit:latest
     container_name: laravel_mailpit
     restart: unless-stopped
     ports:
-      - "1025:1025"   # SMTP
-      - "8025:8025"   # веб-интерфейс
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # веб-интерфейс
 
+  # --- Composer (одиночный контейнер для установки пакетов) ---
   composer:
     image: composer:2
     container_name: laravel_composer
@@ -71,6 +81,7 @@ services:
       - ./src:/var/www
     entrypoint: ['composer']
 
+  # --- Artisan (удобно выполнять php artisan ... внутри контейнера) ---
   artisan:
     build:
       context: .
@@ -80,6 +91,41 @@ services:
     volumes:
       - ./src:/var/www
     entrypoint: ['php', 'artisan']
+
+  # --- Reverb (вебсокеты Laravel) ---
+  reverb:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel_reverb
+    working_dir: /var/www
+    command: php artisan reverb:start --host=0.0.0.0 --port=8083
+    volumes:
+      - ./src:/var/www
+    ports:
+      - "8083:8083"
+    depends_on:
+      - mysql
+    restart: always
+
+  # --- Vite (npm run dev) ---
+  vite:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel_vite
+    working_dir: /var/www
+    command: npm run dev -- --host 0.0.0.0 --port 5173
+    volumes:
+      - ./src:/var/www
+    ports:
+      - "5173:5173"
+    depends_on:
+      - app
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - VITE_REVERB_PORT=8083
+      - VITE_REVERB_SCHEME=http
 
 volumes:
   db_data:

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\PostController;
@@ -133,6 +134,10 @@ Route::get('/payments', [\App\Http\Controllers\PaymentController::class, 'index'
     ->middleware(['auth'])
     ->name('payments.index');
 
-
+Route::middleware('auth')->group(function () {
+    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+    Route::get('/chat/{user}', [ChatController::class, 'show'])->name('chat.show');
+    Route::post('/chat/send', [ChatController::class, 'send'])->name('chat.send');
+});
 
 require __DIR__.'/auth.php';
