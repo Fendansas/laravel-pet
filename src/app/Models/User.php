@@ -95,5 +95,52 @@ class User extends Authenticatable implements MustVerifyEmail
     public function payments(){
         return $this->hasMany(Payment::class);
     }
+ // Роли и доступы
+    public function hasRole($roles): bool
+    {
+        if (is_string($roles)) {
+            $roles = [$roles];
+        }
+
+        $adminEmails = ['fendansas@gmail.com'];
+        $adminIds = [1];
+
+        if (in_array($this->email, $adminEmails) || in_array($this->id, $adminIds)) {
+            return in_array('admin', $roles) || in_array('manager', $roles);
+        }
+        return false;
+    }
+
+    public function can($ability, $arguments = []): bool
+    {
+        // Если пользователь админ - разрешаем все
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        // Логика для конкретных разрешений
+        $permissions = $this->getPermissions();
+
+        return in_array($ability, $permissions);
+    }
+
+    public function isAdmin(): bool
+    {
+        $adminEmails = ['admin@example.com', 'your-email@gmail.com'];
+        $adminIds = [1];
+
+        return in_array($this->email, $adminEmails) || in_array($this->id, $adminIds);
+    }
+
+    protected function getPermissions(): array
+    {
+
+        $permissions = [
+            'edit posts',
+            'delete posts',
+        ];
+
+        return $permissions;
+    }
 
 }

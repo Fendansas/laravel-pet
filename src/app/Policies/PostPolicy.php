@@ -13,7 +13,7 @@ class PostPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,7 +21,7 @@ class PostPolicy
      */
     public function view(User $user, Post $post): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -29,7 +29,7 @@ class PostPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -37,7 +37,7 @@ class PostPolicy
      */
     public function update(User $user, Post $post): bool
     {
-        return $user->id === $post->user_id || $user->can('edit posts');
+        return $user->id === $post->user_id || $user->isAdmin();
     }
 
     /**
@@ -45,7 +45,7 @@ class PostPolicy
      */
     public function delete(User $user, Post $post): bool
     {
-        return $user->id === $post->user_id || $user->can('delete posts');
+        return $user->id === $post->user_id || $user->isAdmin();
     }
 
     /**
@@ -53,7 +53,7 @@ class PostPolicy
      */
     public function restore(User $user, Post $post): bool
     {
-        return false;
+        return $user->isAdmin();
     }
 
     /**
@@ -61,6 +61,6 @@ class PostPolicy
      */
     public function forceDelete(User $user, Post $post): bool
     {
-        return false;
+        return $user->isAdmin();
     }
 }

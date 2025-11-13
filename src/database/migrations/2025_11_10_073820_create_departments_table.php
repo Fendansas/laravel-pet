@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('departments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('topic_id')->nullable()->constrained('topics')->nullOnDelete();
-            $table->string('title');
-            $table->text('content');
-            $table->unsignedInteger('rating')->default(0);
+            $table->string('name');
+            $table->string('type')->nullable();
+            $table->string('color')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('posts');
+        Schema::dropIfExists('departments');
     }
 };

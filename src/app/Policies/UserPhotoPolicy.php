@@ -13,7 +13,7 @@ class UserPhotoPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,7 +21,7 @@ class UserPhotoPolicy
      */
     public function view(User $user, UserPhoto $userPhoto): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -29,7 +29,7 @@ class UserPhotoPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -37,7 +37,7 @@ class UserPhotoPolicy
      */
     public function update(User $user, UserPhoto $userPhoto): bool
     {
-        return false;
+        return $user->id === $userPhoto->user_id || $user->isAdmin();
     }
 
     /**
@@ -45,7 +45,7 @@ class UserPhotoPolicy
      */
     public function delete(User $user, UserPhoto $userPhoto): bool
     {
-        return $userPhoto->user_id === $user->id;
+        return $user->id === $userPhoto->user_id || $user->isAdmin();
     }
 
     /**
@@ -53,7 +53,7 @@ class UserPhotoPolicy
      */
     public function restore(User $user, UserPhoto $userPhoto): bool
     {
-        return false;
+        return $user->isAdmin();
     }
 
     /**
@@ -61,6 +61,6 @@ class UserPhotoPolicy
      */
     public function forceDelete(User $user, UserPhoto $userPhoto): bool
     {
-        return false;
+        return $user->isAdmin();
     }
 }
