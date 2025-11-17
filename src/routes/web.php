@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\EventParticipantController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
@@ -143,16 +144,35 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
-    Route::middleware(['auth'])->group(function () {
-        Route::resource('events', EventController::class);
-        Route::get('events/{event}/tasks', [TaskController::class, 'index'])->name('tasks.index');
-        Route::get('tasks/create', [TaskController::class, 'create'])->name('tasks.create');
-        Route::post('tasks', [TaskController::class, 'store'])->name('tasks.store');
-        Route::get('tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
-        Route::get('tasks/{task}/edit', [TaskController::class, 'edit'])->name('tasks.edit');
-        Route::put('tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
-        Route::delete('tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
-    });
+    Route::resource('events', EventController::class);
+    Route::get('events/{event}/tasks', [TaskController::class, 'index'])->name('tasks.index');
+    Route::get('tasks/create', [TaskController::class, 'create'])->name('tasks.create');
+    Route::post('tasks', [TaskController::class, 'store'])->name('tasks.store');
+    Route::get('tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
+    Route::get('tasks/{task}/edit', [TaskController::class, 'edit'])->name('tasks.edit');
+    Route::put('tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
+    Route::delete('tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
 });
+
+
+Route::middleware('auth')->group(function () {
+
+    Route::get('/participants', [EventParticipantController::class, 'index'])
+        ->name('participants.index');
+    Route::get('/participants/create', [EventParticipantController::class, 'create'])
+        ->name('participants.create');
+    Route::post('/participants', [EventParticipantController::class, 'store'])
+        ->name('participants.store');
+    Route::get('/participants/{participant}', [EventParticipantController::class, 'show'])
+        ->name('participants.show');
+    Route::get('/participants/{participant}/edit', [EventParticipantController::class, 'edit'])
+        ->name('participants.edit');
+    Route::put('/participants/{participant}', [EventParticipantController::class, 'update'])
+        ->name('participants.update');
+    Route::delete('/participants/{participant}', [EventParticipantController::class, 'destroy'])
+        ->name('participants.destroy');
+
+});
+
 
 require __DIR__.'/auth.php';

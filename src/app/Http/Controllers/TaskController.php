@@ -38,12 +38,17 @@ class TaskController extends Controller
     {
         $data = $request->validate([
             'event_id' => 'required|exists:events,id',
-            'department_id' => 'required|exists:departments,id',
-            'assigned_to' => 'required|exists:event_participants,id',
+            'department_id' => 'nullable|exists:departments,id',
+            'assigned_to' => 'nullable|exists:event_participants,id',
             'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'deadline' => 'required|date',
+            'description' => 'nullable|string',
+            'deadline' => 'nullable|date',
         ]);
+        if ($data['assigned_to']){
+            $data['status'] = 'assigned';
+        } else {
+            $data['status'] = 'not_assigned';
+        }
 
         Task::create($data);
 

@@ -48,10 +48,22 @@ class EventController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Event $event)
+    public function show(Event $event, Request $request)
     {
-        $event->load('tasks.department', 'tasks.assignedTo');
-        return view('events.show', compact('event'));
+        $status = $request->get('status');
+
+
+        $event->load([
+            'tasks' => function ($query) use ($status) {
+                if ($status) {
+                    $query->where('status', $status);
+                }
+                $query->orderBy('status')->orderByDesc('created_at');
+            },
+            'tasks.department',
+            'tasks.assignedTo'
+        ]);
+        return view('events.show', compact('event', 'status'));
     }
 
     /**
