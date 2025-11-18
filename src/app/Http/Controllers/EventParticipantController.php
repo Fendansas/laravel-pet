@@ -45,17 +45,27 @@ class EventParticipantController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(EventParticipant $eventParticipant)
+    public function show(Request $request, EventParticipant $participant)
     {
-        return view('participants.show', compact('eventParticipant') );
+        $status = $request->get('status');
+
+        $tasksQuery = $participant->tasks()->with(['event', 'department']);
+
+        if($status){
+            $tasksQuery->where('status', $status);
+        }
+
+        $tasks = $tasksQuery->get();
+
+        return view('participants.show', compact('participant', 'tasks', 'status') );
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(EventParticipant $eventParticipant)
+    public function edit(EventParticipant $participant)
     {
-        return view('participants.edit', compact('eventParticipant'));
+        return view('participants.edit', compact('participant'));
     }
 
     /**
@@ -75,9 +85,9 @@ class EventParticipantController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(EventParticipant $eventParticipant)
+    public function destroy(EventParticipant $participant)
     {
-        $eventParticipant->delete();
+        $participant->delete();
 
         return redirect()->route('participants.index')->with('message', 'Event Participant Deleted Successfully');
     }
