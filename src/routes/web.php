@@ -53,34 +53,26 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/unfollow/{user}', [FollowController::class, 'unfollow'])->name('unfollow');
 });
 
-Route::middleware(['auth', 'admin'])
+Route::middleware(['auth', 'role:admin'])
     ->prefix('admin')
     ->group(function () {
         Route::get('/users', [UserController::class, 'index'])
-            ->can('viewAny-user', \App\Models\User::class)
+//            ->can('viewAny-user', \App\Models\User::class)
             ->name('admin.users.index');
 
         Route::get('/users/{user}', [UserController::class, 'show'])
-            ->can('view-user', 'user')
+//            ->can('view-user', 'user')
             ->name('admin.users.show');
-
-//        Route::get('/users/{user}/edit', [UserController::class, 'edit'])
-//            ->can('update-user', 'user')
-//            ->name('admin.users.edit');
-
-//        Route::delete('/users/{user}', [UserController::class, 'destroy'])
-//            ->can('delete-user', 'user')
-//            ->name('admin.users.destroy');
     });
 
 Route::middleware('auth')->group(function () {
     Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
     Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
-    Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
     Route::get('/posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
     Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+    Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
 
 });
 

@@ -7,12 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles, HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens;
 
     /**
      * The attributes that are mass assignable.
@@ -96,32 +95,10 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Payment::class);
     }
  // Роли и доступы
-    public function hasRole($roles): bool
+
+    public function can($permissions, $arguments = [])
     {
-        if (is_string($roles)) {
-            $roles = [$roles];
-        }
-
-        $adminEmails = ['fendansas@gmail.com'];
-        $adminIds = [1];
-
-        if (in_array($this->email, $adminEmails) || in_array($this->id, $adminIds)) {
-            return in_array('admin', $roles) || in_array('manager', $roles);
-        }
-        return false;
-    }
-
-    public function can($ability, $arguments = []): bool
-    {
-        // Если пользователь админ - разрешаем все
-        if ($this->isAdmin()) {
-            return true;
-        }
-
-        // Логика для конкретных разрешений
-        $permissions = $this->getPermissions();
-
-        return in_array($ability, $permissions);
+        return $this->hasPermission($permissions);
     }
 
     public function isAdmin(): bool
@@ -141,6 +118,75 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
 
         return $permissions;
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'user_role');
+    }
+
+
+    public function assignRole($role){
+        $role = Role::where('name', $role)->firstOrFail();
+
+        return $this->roles()->syncWithoutDetaching([$role->id]);
+    }
+
+    public function removeRole($role)
+    {
+        if (is_string($role)) {
+            $role = Role::where('name', $role)->first();
+            if (!$role) return $this;
+        }
+        $this->roles()->detach($role->id);
+        return $this;
+    }
+
+    public function syncRoles(array $roles)
+    {
+        $roleIds = Role::whereIn('name', $roles)->pluck('id')->toArray();
+        $this->roles()->sync($roleIds);
+        return $this;
+    }
+
+    public function hasRole($roles){
+        if (is_string($roles)) {
+            $roles = [$roles];
+        }
+        return $this->roles()->whereIn('name', $roles)->exists();
+    }
+
+
+    public function hasPermission($permission){
+
+        if(is_string($permission)){
+            $permission = [$permission];
+        }
+
+
+        return $this->roles()
+            ->whereHas('permissions', function ($query) use ($permission) {
+               $query->whereIn('permissions.name', $permission);
+            })
+            ->exists();
+    }
+
+    public function canEditPost(Post $post): bool
+    {
+        if($this->isAdmin()){
+            return true;
+        }
+
+        if ($this->hasPermission('edit posts')) {
+            return true;
+        }
+
+        if ($this->id === $post->user_id && $this->hasPermission('edit own posts')) {
+            return true;
+        }
+
+        return false;
+
     }
 
 }

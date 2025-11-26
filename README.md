@@ -120,15 +120,15 @@ docker compose run --rm composer update
 - Artisan:
 
 ```bash
-docker compose run --rm artisan migrate
-docker compose run --rm artisan db:seed
-docker compose run --rm artisan tinker
+    docker compose run --rm artisan migrate
+    docker compose run --rm artisan db:seed
+    docker compose run --rm artisan tinker
 ```
 
 - для запуска работы расписания нужно запустить команду лшкально:
 
 ```bash
-docker compose run --rm artisan schedule:work
+  docker compose run --rm artisan schedule:work
 ```
 - Для продакшена (через cron):
 
@@ -136,4 +136,9 @@ docker compose run --rm artisan schedule:work
 crontab -e
 * * * * * cd /path/to/your/project && php artisan schedule:run >> /dev/null 2>&1
 
+```
+
+- ЗАпуск сидера для создания ролей
+```bash
+    docker compose run --rm artisan db:seed --class=RolesAndPermissionsSeeder
 ```

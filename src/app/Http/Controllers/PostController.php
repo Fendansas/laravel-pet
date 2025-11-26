@@ -14,13 +14,20 @@ class PostController extends Controller
     public function index(Request $request){
 
         $topics = Topic::all();
-        $query = Post::with('user', 'topic')->published();
+        $query = Post::query()->with(['user', 'topic']);
+
+        $this->authorize('viewAny', Post::class);
+
+        if (!auth()->user()->hasPermission('view all posts')) {
+            $query->published();
+        }
+
         // сортировка по постам
         if($request->filled('topic_id')){
             $query->where('topic_id', $request->topic_id);
         }
 
-        // писк по потам
+        // писк по постам
         if ($request->filled('search')){
             $search = $request->search;
 
@@ -35,10 +42,14 @@ class PostController extends Controller
     }
 
     public function create(){
+        $this->authorize('create', Post::class);
         $topics = Topic::all();
         return view('posts.create', compact('topics'));
     }
     public function store(Request $request){
+
+        $this->authorize('create', Post::class);
+
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
@@ -55,6 +66,7 @@ class PostController extends Controller
     }
 
     public function show(Post $post){
+        $this->authorize('view', $post);
         return view('posts.show', compact('post'));
     }
 
@@ -73,8 +85,8 @@ class PostController extends Controller
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'topic_id' => 'nullable|exists:topics,id',
-            'status' => 'required|in:draft,published',
+//            'topic_id' => 'nullable|exists:topics,id',
+//            'status' => 'required|in:draft,published',
             'published_at' => 'nullable|date|after_or_equal:now',
         ]);
         $post->update($data);
@@ -83,9 +95,9 @@ class PostController extends Controller
     }
 
     public function destroy(Post $post){
-        if(Auth::id() != $post->id && !Auth::user()->hasRole('admin')){
-            abort(403, 'У вас нет прав для удаления.');
-        }
+
+        $this->authorize('delete', $post);
+
         return redirect()->route('posts.index')->with('success', 'Пост успешно удалён.');
     }
 
