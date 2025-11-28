@@ -53,22 +53,14 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/unfollow/{user}', [FollowController::class, 'unfollow'])->name('unfollow');
 });
 
-Route::middleware(['auth', 'role:admin'])
-    ->prefix('admin')
-    ->group(function () {
-        Route::get('/users', [UserController::class, 'index'])
-//            ->can('viewAny-user', \App\Models\User::class)
-            ->name('admin.users.index');
 
-        Route::get('/users/{user}', [UserController::class, 'show'])
-//            ->can('view-user', 'user')
-            ->name('admin.users.show');
-    });
 
 Route::middleware('auth')->group(function () {
     Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
     Route::get('/posts/create', [PostController::class, 'create'])->name('posts.create');
-    Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
+    Route::post('/posts', [PostController::class, 'store'])
+        ->middleware('can:create,App\Models\Post')
+        ->name('posts.store');
     Route::get('/posts/{post}/edit', [PostController::class, 'edit'])
         ->middleware('can:update,post')
         ->name('posts.edit');

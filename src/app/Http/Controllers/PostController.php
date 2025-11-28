@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PostRequest;
 use App\Models\Post;
 use App\Models\PostRating;
 use Illuminate\Http\Request;
@@ -46,18 +47,9 @@ class PostController extends Controller
         $topics = Topic::all();
         return view('posts.create', compact('topics'));
     }
-    public function store(Request $request){
+    public function store(PostRequest $request){
 
-        $this->authorize('create', Post::class);
-
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'topic_id' => 'required|exists:topics,id',
-            'status' => 'required|in:draft,published',
-            'published_at' => 'nullable|date|after_or_equal:now',
-        ]);
-
+        $data= $request->validated();
         $data['user_id'] = Auth::id();
 
         Post::create($data);
@@ -78,18 +70,9 @@ class PostController extends Controller
         return view('posts.edit', compact('post', 'topics'));
     }
 
-    public function update(Request $request, Post $post){
+    public function update(PostRequest $request, Post $post){
 
-//        $this->authorize('update', $post);
-
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-//            'topic_id' => 'nullable|exists:topics,id',
-//            'status' => 'required|in:draft,published',
-            'published_at' => 'nullable|date|after_or_equal:now',
-        ]);
-        $post->update($data);
+        $post->update($request->validated());
 
         return redirect()->route('posts.show', $post)->with('success', 'Post updated successfully.');
     }
