@@ -38,10 +38,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'view all posts'        => 'View all posts',
         ];
 
-        foreach ($permissions as $perm) {
+        foreach ($permissions as $permName) {
             Permission::create([
-                'name' => $perm,
-                'label' => $labels[$perm]]);
+                'name' => $permName,
+                'label' => $labels[$permName]?? $permName]);
         }
         // получаем все премишены и id
         $perms = Permission::pluck('id','name');

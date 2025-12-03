@@ -16,11 +16,36 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
                 </div>
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.index')">
-                        {{ __('Users for admin') }}
-                    </x-nav-link>
+                @if(auth()->user()->hasRole('admin'))
+                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex" style="align-items: center;">
+
+                    <x-dropdown align="left">
+                        <x-slot name="trigger">
+                            <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                                Админ
+                                <svg class="ms-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
+                        </x-slot>
+
+                        <x-slot name="content">
+                            <x-dropdown-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.index')">
+                                Пользователи
+                            </x-dropdown-link>
+
+                            <x-dropdown-link :href="route('admin.roles.index')">
+                                Роли
+                            </x-dropdown-link>
+
+                            <x-dropdown-link :href="route('admin.permissions.index')">
+                                Права
+                            </x-dropdown-link>
+
+                        </x-slot>
+                    </x-dropdown>
                 </div>
+                @endif
                 <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
                     {{ __('Users') }}
                 </x-nav-link>

@@ -28,6 +28,10 @@
                     <p><strong>Количество постов:</strong> {{ $postsCount }}</p>
                     <p><strong>Количество комментариев:</strong> {{ $commentsCount }}</p>
 
+                    <a href="{{ route('admin.users.role.edit', $user) }}">
+                        <x-primary-button>Роли</x-primary-button>
+                    </a>
+
                     @if(Auth::check() && Auth::id() !== $user->id)
                         @if(Auth::user()->isFollowing($user))
                             <form action="{{ route('unfollow', $user) }}" method="POST">

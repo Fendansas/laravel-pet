@@ -125,11 +125,29 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(Role::class, 'user_role');
     }
 
+    public function permissions(){
+        return $this->roles()
+            ->with('permissions')
+            ->get()
+            ->flatten()
+            ->unique('id');
+    }
+
 
     public function assignRole($role){
-        $role = Role::where('name', $role)->firstOrFail();
 
-        return $this->roles()->syncWithoutDetaching([$role->id]);
+        if (is_numeric($role)) {
+            $this->roles()->syncWithoutDetaching([$role]);
+        }else{
+            $role = Role::where('name', $role)->firstOrFail();
+            if ($role) {
+                $this->roles()->syncWithoutDetaching([$role->id]);
+            }
+        }
+
+//        $role = Role::where('name', $role)->firstOrFail();
+//
+//        return $this->roles()->syncWithoutDetaching([$role->id]);
     }
 
     public function removeRole($role)
