@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Role\RoleStoreRequest;
+use App\Http\Requests\Role\RoleUpdateRequest;
 use App\Models\Permission;
 use App\Models\Role;
 use Illuminate\Http\Request;
@@ -16,13 +18,9 @@ class RoleController extends Controller
          return view('admin.roles.create');
      }
 
-     public function store(Request $request){
+     public function store(RoleStoreRequest $request){
 
-         $data = $request->validate([
-             'name' => 'required|unique:roles,name',
-             'label' => 'nullable',
-         ]);
-         Role::create($data);
+         Role::create($request->validated());
 
          return redirect()->route('admin.roles.index')->with('success', 'Role created successfully');
      }
@@ -34,12 +32,8 @@ class RoleController extends Controller
          ]);
      }
 
-     public function update(Request $request, Role $role){
-         $date= $request->validate([
-             'name' => 'required|unique:roles,name',
-             'label' => 'nullable',
-         ]);
-         $role->update($date);
+     public function update(RoleUpdateRequest $request, Role $role){
+         $role->update($request->validated());
          $role->permissions()->sync($request->permissions ?? []);
 
          return redirect()->route('admin.roles.index')->with('success', 'Role updated successfully');

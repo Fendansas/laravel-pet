@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Event\EventStoreRequest;
+use App\Http\Requests\Event\EventUpdateRequest;
 use App\Models\Event;
 use Illuminate\Http\Request;
 
@@ -29,14 +31,9 @@ class EventController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(EventStoreRequest $request)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-        ]);
+        $data = $request->validated();
 
         $data['created_by'] = auth()->id();
         $data['status'] = 'active';
@@ -77,17 +74,10 @@ class EventController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Event $event)
+    public function update(EventUpdateRequest $request, Event $event)
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-            'status' => 'required|string',
-        ]);
 
-        $event->update($data);
+        $event->update($request->validated());
 
         return redirect()->route('events.index')->with('success', 'Event updated successfully.');
     }

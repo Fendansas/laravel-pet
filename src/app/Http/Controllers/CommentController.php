@@ -2,17 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CommentStoreRequest;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use App\Models\Comment;
 use Illuminate\Support\Facades\Auth;
 class CommentController extends Controller
 {
-    public function store(Request $request, Post $post){
-        $data = $request->validate([
-            'content' => 'required|string|max:255',
-            'parent_id' => 'nullable|exists:comments,id',
-        ]);
+    public function store(CommentStoreRequest $request, Post $post){
+        $data = $request->validated();
         $post->comments()->create([
             'content' => $data['content'],
             'user_id' => auth()->id(),

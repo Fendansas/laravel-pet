@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Department\DepartmentStoreRequest;
+use App\Http\Requests\Department\DepartmentUpdateRequest;
 use App\Models\Department;
 use Illuminate\Http\Request;
 
@@ -16,16 +18,9 @@ class DepartmentController extends Controller
         return view('departments.create');
     }
 
-    public function store(Request $request){
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'type' => 'nullable|string|max:255',
-            'color' => 'nullable|string|max:255',
-            'is_active' => 'boolean',
-            'description' => 'nullable|string',
-        ]);
+    public function store(DepartmentStoreRequest $request){
 
-        Department::create($validated);
+        Department::create($request->validated());
 
         return redirect()->route('departments.index')->with('success', 'Department created successfully.');
     }
@@ -34,15 +29,15 @@ class DepartmentController extends Controller
         return view('departments.show', compact('department'));
     }
 
-    public function edit(Request $request, Department $department){
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'type' => 'nullable|string|max:255',
-            'color' => 'nullable|string|max:255',
-            'is_active' => 'boolean',
-            'description' => 'nullable|string',
-        ]);
-        $department->update($validated);
+    public function edit(Department $department)
+    {
+        return view('departments.edit', compact('department'));
+    }
+
+    public function update(DepartmentUpdateRequest $request, Department $department){
+
+        $department->update($request->validated());
+
         return redirect()->route('departments.index')->with('success', 'Department updated successfully.');
     }
 

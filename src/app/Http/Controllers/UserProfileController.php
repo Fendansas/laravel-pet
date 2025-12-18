@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UserProfileRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\UserProfile;
@@ -27,18 +28,11 @@ class UserProfileController extends Controller
         return view('user-profile.edit', compact('profile'));
     }
 
-    public function store(Request $request)
+    public function store(UserProfileRequest $request)
     {
         $user = Auth::user();
 
-        $data = $request->validate([
-            'date_of_birth' => 'nullable|date',
-            'gender' => 'nullable|string|max:10',
-            'city' => 'nullable|string|max:100',
-            'country' => 'nullable|string|max:100',
-            'status_message' => 'nullable|string|max:255',
-            'avatar' => 'nullable|image|max:2048',
-        ]);
+        $data = $request->validated();
 
         if ($request->hasFile('avatar')) {
             $data['avatar'] = $request->file('avatar')->store('avatars', 'public');
@@ -51,7 +45,7 @@ class UserProfileController extends Controller
         return redirect()->route('user-profile.edit')->with('success', 'Профиль создан');
     }
 
-    public function update(Request $request)
+    public function update(UserProfileRequest $request)
     {
         $user = Auth::user();
         $profile = $user->profile;
@@ -60,14 +54,7 @@ class UserProfileController extends Controller
             return $this->store($request);
         }
 
-        $data = $request->validate([
-            'date_of_birth' => 'nullable|date',
-            'gender' => 'nullable|string|max:10',
-            'city' => 'nullable|string|max:100',
-            'country' => 'nullable|string|max:100',
-            'status_message' => 'nullable|string|max:255',
-            'avatar' => 'nullable|image|max:2048',
-        ]);
+        $data = $request->validated();
 
         if ($request->hasFile('avatar')) {
             if ($profile->avatar) {

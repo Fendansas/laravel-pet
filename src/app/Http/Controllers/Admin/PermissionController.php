@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\PermissionRequest;
 use App\Models\Permission;
 use Illuminate\Http\Request;
 
@@ -17,13 +18,9 @@ class PermissionController extends Controller
         return view('admin.permissions.create');
     }
 
-    public function store(Request $request){
-        $data = $request->validate([
-            'name' => 'required|string|max:255|unique:permissions,name',
-            'label' => 'nullable|string|max:255',
-        ]);
+    public function store(PermissionRequest $request){
 
-        Permission::create($data);
+        Permission::create($request->validated());
         return redirect()->route('admin.permissions.index')
             ->with('success', 'Permission created successfully');
     }
@@ -32,13 +29,9 @@ class PermissionController extends Controller
         return view('admin.permissions.edit', compact('permission'));
     }
 
-    public function update(Request $request, Permission $permission){
-        $data = $request->validate([
-            'name'  => 'required|string|max:255|unique:permissions,name,' . $permission->id,
-            'label' => 'nullable|string|max:255',
-        ]);
+    public function update(PermissionRequest $request, Permission $permission){
 
-        $permission->update($data);
+        $permission->update($request->validated());
 
         return redirect()->route('admin.permissions.index')
             ->with('success', 'Permission updated successfully');

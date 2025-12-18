@@ -142,3 +142,8 @@ crontab -e
 ```bash
     docker compose run --rm artisan db:seed --class=RolesAndPermissionsSeeder
 ```
+
+- ЗАпуск сайта локально
+```bash
+    docker compose up -d
+```

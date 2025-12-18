@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EventParticipant\EventParticipantStoreRequest;
+use App\Http\Requests\EventParticipant\EventParticipantUpdateRequest;
 use App\Models\EventParticipant;
 use Illuminate\Http\Request;
 
@@ -27,17 +29,10 @@ class EventParticipantController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(EventParticipantStoreRequest $request)
     {
-        $validated = $request->validate([
-           'name' => 'required|string',
-           'email' => 'nullable|email',
-           'phone' => 'nullable|string',
-           'position' => 'nullable|string',
-           'notes' => 'nullable|string',
-        ]);
 
-        EventParticipant::create($validated);
+        EventParticipant::create($request->validated());
 
         return redirect()->route('participants.index')->with('message', 'Event Participant Created Successfully');
     }
@@ -71,15 +66,11 @@ class EventParticipantController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(EventParticipantUpdateRequest $request, EventParticipant $participant)
     {
-        $validated = $request->validate([
-            'name' => 'required|string',
-            'email' => 'nullable|email',
-            'phone' => 'nullable|string',
-            'position' => 'nullable|string',
-            'notes' => 'nullable|string',
-        ]);
+        $participant->update($request->validated());
+
+        return redirect()->route('participants.index')->with('message', 'Event Participant Updated Successfully');
     }
 
     /**

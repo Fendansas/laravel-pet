@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Chat\SendMessageRequest;
 use App\Models\Conversation;
 use Illuminate\Http\Request;
 use App\Events\MessageSent;
@@ -43,12 +44,8 @@ class ChatController extends Controller
 
 
 
-    public function send(Request $request)
+    public function send(SendMessageRequest $request)
     {
-        $request->validate([
-            'recipient_id' => 'required|exists:users,id',
-            'message' => 'required|string|max:5000',
-        ]);
 
         $authUser = auth()->user();
 

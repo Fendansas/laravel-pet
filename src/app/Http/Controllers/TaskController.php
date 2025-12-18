@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Task\StoreTaskRequest;
+use App\Http\Requests\Task\UpdateTaskRequest;
 use App\Models\Department;
 use App\Models\Event;
 use App\Models\EventParticipant;
@@ -34,16 +36,10 @@ class TaskController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreTaskRequest $request)
     {
-        $data = $request->validate([
-            'event_id' => 'required|exists:events,id',
-            'department_id' => 'nullable|exists:departments,id',
-            'assigned_to' => 'nullable|exists:event_participants,id',
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'deadline' => 'nullable|date',
-        ]);
+        $data = $request->validated();
+
         if ($data['assigned_to']){
             $data['status'] = 'assigned';
         } else {
@@ -52,7 +48,9 @@ class TaskController extends Controller
 
         Task::create($data);
 
-        return redirect()->route('events.show', $data['event_id'])->with('success', 'Task created successfully.');
+        return redirect()
+            ->route('events.show', $data['event_id'])
+            ->with('success', 'Task created successfully.');
     }
 
     /**
@@ -78,20 +76,13 @@ class TaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Task $task)
+    public function update(UpdateTaskRequest $request, Task $task)
     {
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'department_id' => 'nullable|exists:departments,id',
-            'assigned_to' => 'nullable|exists:event_participants,id',
-            'status' => 'required|string',
-            'deadline' => 'nullable|date',
-        ]);
+        $task->update($request->validated());
 
-        $task->update($data);
-
-        return redirect()->route('events.show', $task->event_id)->with('success', 'Task updated successfully.');
+        return redirect()
+            ->route('events.show', $task->event_id)
+            ->with('success', 'Task updated successfully.');
     }
 
     /**
