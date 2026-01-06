@@ -5,16 +5,21 @@ namespace App\Http\Controllers;
 use App\Http\Requests\EventParticipant\EventParticipantStoreRequest;
 use App\Http\Requests\EventParticipant\EventParticipantUpdateRequest;
 use App\Models\EventParticipant;
+use App\Services\EventParticipantService;
 use Illuminate\Http\Request;
 
 class EventParticipantController extends Controller
 {
+    public function __construct(
+        protected EventParticipantService $service
+    ) {}
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $participants = EventParticipant::latest()->paginate(10);
+        $participants = $this->service->getParticipants();
         return view('participants.index', compact('participants'));
     }
 
@@ -32,7 +37,7 @@ class EventParticipantController extends Controller
     public function store(EventParticipantStoreRequest $request)
     {
 
-        EventParticipant::create($request->validated());
+        $this->service->createParticipant($request->validated());
 
         return redirect()->route('participants.index')->with('message', 'Event Participant Created Successfully');
     }
@@ -42,15 +47,9 @@ class EventParticipantController extends Controller
      */
     public function show(Request $request, EventParticipant $participant)
     {
-        $status = $request->get('status');
+        $status = $this->service->resolveStatusFromRequest($request);
 
-        $tasksQuery = $participant->tasks()->with(['event', 'department']);
-
-        if($status){
-            $tasksQuery->where('status', $status);
-        }
-
-        $tasks = $tasksQuery->get();
+        $tasks = $this->service->getParticipantTasks($participant, $status);
 
         return view('participants.show', compact('participant', 'tasks', 'status') );
     }
@@ -68,7 +67,7 @@ class EventParticipantController extends Controller
      */
     public function update(EventParticipantUpdateRequest $request, EventParticipant $participant)
     {
-        $participant->update($request->validated());
+        $this->service->updateParticipant($participant, $request->validated());
 
         return redirect()->route('participants.index')->with('message', 'Event Participant Updated Successfully');
     }
@@ -78,7 +77,7 @@ class EventParticipantController extends Controller
      */
     public function destroy(EventParticipant $participant)
     {
-        $participant->delete();
+        $this->service->deleteParticipant($participant);
 
         return redirect()->route('participants.index')->with('message', 'Event Participant Deleted Successfully');
     }

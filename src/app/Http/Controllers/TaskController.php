@@ -8,16 +8,24 @@ use App\Models\Department;
 use App\Models\Event;
 use App\Models\EventParticipant;
 use App\Models\Task;
+use App\Services\Event\EventResolver;
+use App\Services\Task\TaskService;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
+    public function __construct(
+        private TaskService $taskService,
+        private EventResolver $eventResolver,
+    ) {}
+
+
     /**
      * Display a listing of the resource.
      */
     public function index(Event $event)
     {
-        $tasks = $event->tasks()->with(['department', 'assignedTo'])->paginate(10);
+        $tasks = $this->taskService->paginateTasksForEvent($event->id);
         return view('tasks.index', compact('tasks', 'event'));
     }
 
@@ -26,7 +34,7 @@ class TaskController extends Controller
      */
     public function create(Request $request)
     {
-         $event = Event::findOrFail($request->get('event_id'));
+         $event = $this->eventResolver->findOrFail((int) $request->get('event_id'));
          $departments = Department::orderBy('name')->get();
          $participants = EventParticipant::orderBy('name')->get();
 
@@ -38,18 +46,9 @@ class TaskController extends Controller
      */
     public function store(StoreTaskRequest $request)
     {
-        $data = $request->validated();
-
-        if ($data['assigned_to']){
-            $data['status'] = 'assigned';
-        } else {
-            $data['status'] = 'not_assigned';
-        }
-
-        Task::create($data);
-
+        $task = $this->taskService->storeTask($request->validated());
         return redirect()
-            ->route('events.show', $data['event_id'])
+            ->route('events.show', $task->event_id)
             ->with('success', 'Task created successfully.');
     }
 
@@ -67,10 +66,11 @@ class TaskController extends Controller
      */
     public function edit(Task $task)
     {
-        $departments = Department::orderBy('name')->get();
-        $participants = EventParticipant::orderBy('name')->get();
-
-        return view('tasks.edit', compact('task', 'departments', 'participants'));
+        return view('tasks.edit', [
+            'task'         => $task,
+            'departments'  => Department::orderBy('name')->get(),
+            'participants' => EventParticipant::orderBy('name')->get(),
+        ]);
     }
 
     /**
@@ -78,7 +78,7 @@ class TaskController extends Controller
      */
     public function update(UpdateTaskRequest $request, Task $task)
     {
-        $task->update($request->validated());
+        $this->taskService->updateTask($task, $request->validated());
 
         return redirect()
             ->route('events.show', $task->event_id)
@@ -91,7 +91,9 @@ class TaskController extends Controller
     public function destroy(Task $task)
     {
         $eventId = $task->event_id;
-        $task->delete();
-        return redirect()->route('events.show', $eventId)->with('success', 'Task deleted successfully.');
+        $this->taskService->deleteTask($task);
+        return redirect()
+            ->route('events.show', $eventId)
+            ->with('success', 'Task deleted successfully.');
     }
 }

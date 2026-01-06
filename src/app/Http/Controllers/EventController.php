@@ -5,18 +5,21 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Event\EventStoreRequest;
 use App\Http\Requests\Event\EventUpdateRequest;
 use App\Models\Event;
+use App\Services\EventService;
 use Illuminate\Http\Request;
 
 class EventController extends Controller
 {
+
+    public function __construct(
+        protected EventService $service
+    ) {}
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $events = Event::with('tasks')
-            ->orderByDesc('created_at')
-            ->paginate(15);
+        $events = $this->service->getEvents();
         return view('events.index', compact('events'));
     }
 
@@ -33,12 +36,8 @@ class EventController extends Controller
      */
     public function store(EventStoreRequest $request)
     {
-        $data = $request->validated();
+        $this->service->createEvent($request->validated());
 
-        $data['created_by'] = auth()->id();
-        $data['status'] = 'active';
-
-        Event::create($data);
         return redirect()->route('events.index')->with('success', 'Event created successfully.');
     }
 
@@ -47,19 +46,10 @@ class EventController extends Controller
      */
     public function show(Event $event, Request $request)
     {
-        $status = $request->get('status');
+        $status = $this->service->resolveStatus($request);
 
+        $event = $this->service->loadEventWithTasks($event, $status);
 
-        $event->load([
-            'tasks' => function ($query) use ($status) {
-                if ($status) {
-                    $query->where('status', $status);
-                }
-                $query->orderBy('status')->orderByDesc('created_at');
-            },
-            'tasks.department',
-            'tasks.assignedTo'
-        ]);
         return view('events.show', compact('event', 'status'));
     }
 
@@ -77,7 +67,7 @@ class EventController extends Controller
     public function update(EventUpdateRequest $request, Event $event)
     {
 
-        $event->update($request->validated());
+       $this->service->updateEvent($event, $request->validated());
 
         return redirect()->route('events.index')->with('success', 'Event updated successfully.');
     }

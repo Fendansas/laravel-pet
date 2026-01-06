@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\PaymentService;
+use App\Services\StripeService;
 use Illuminate\Http\Request;
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
@@ -10,34 +12,29 @@ use App\Models\Payment;
 use Illuminate\Support\Facades\Auth;
 class StripeController extends Controller
 {
-    public function createPaymentIntent(Request $request){
-        $request->validate([
+    public function createPaymentIntent(Request $request, StripeService $stripeService, PaymentService $paymentService){
+        $data = $request->validate([
             'amount' => 'required|numeric|min:1',
         ]);
-        $amount = $request->input('amount');
-        $amountInCents = $amount * 100;
+        $amount = $data['amount'];
+        $amountInCents =  ($amount * 100);
+        $user = Auth::user();
 
-        Stripe::setApiKey(env('STRIPE_SECRET'));
-
-        $paymentIntent = PaymentIntent::create([
-            'amount' => $amountInCents,
-            'currency' => 'usd',
-            'description' => 'Replenishment of user balance' . auth()->user()->email,
-            'payment_method_types' => ['card'],
-            'metadata' => [
-                'user_id'=> auth()->user()->id,
-                'action'=> 'deposit'
+        $paymentIntent = $stripeService->createPaymentIntent(
+            $amountInCents,
+            [
+                'user_id' => $user->id,
+                'action' => 'deposit',
             ],
-        ]);
+            'Replenishment of user balance: ' . $user->email
+        );
 
-        Payment::create([
-            'user_id' => auth()->id(),
-            'payment_intent_id' => $paymentIntent->id,
-            'amount' => $amount,
-            'currency' => 'usd',
-            'status' => 'created',
-            'metadata' => $paymentIntent->metadata,
-        ]);
+        $paymentService->create(
+            $user->id,
+            $paymentIntent->id,
+            $amount,
+            $paymentIntent->metadata->toArray()
+        );
 
 
         return response()->json([
@@ -45,27 +42,30 @@ class StripeController extends Controller
         ]);
     }
 
-    public function webhook(Request $request){
+    public function webhook(Request $request, PaymentService $paymentService){
 
-        $payload = @file_get_contents('php://input');
+        $payload = $request->getContent();
         $event = json_decode($payload, true);
 
-        if(isset($event['type']) && $event['type'] == 'payment_intent.succeeded'){
+        if (
+            isset($event['type']) &&
+            $event['type'] === 'payment_intent.succeeded'
+        ) {
             $paymentIntent = $event['data']['object'];
+
             $userId = $paymentIntent['metadata']['user_id'] ?? null;
             $amount = $paymentIntent['amount'] / 100;
 
-            if ($userId && $user = User::find($userId)) {
-                $user->increment('balance', $amount);
-
-                Payment::where('payment_intent_id', $paymentIntent['id'])
-                    ->update(['status' => 'succeeded']);
+            if ($userId) {
+                $paymentService->handleSuccess(
+                    $paymentIntent['id'],
+                    $amount,
+                    (int) $userId
+                );
             }
         }
 
-        return response()->json([
-            'status' => 'success',
-        ]);
+        return response()->json(['status' => 'success']);
     }
 
 

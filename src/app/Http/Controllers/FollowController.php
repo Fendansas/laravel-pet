@@ -4,25 +4,24 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Notifications\UserFollowed;
+use App\Services\FollowService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 class FollowController extends Controller
 {
+    public function __construct(private FollowService $followService){}
+
     public function follow(User $user){
-        $follower = Auth::user();
+        try {
+            $result = $this->followService->follow(Auth::user(), $user);
 
-        if ($follower->id === $user->id){
-            return back()->with('error', 'You cannot follow yourself.');
+            if(!$result){
+                return back()->with('info','You are already subscribed.');
+            }
+            return back()->with('success','You are subscribed.');
+        } catch (\DomainException $e) {
+            return back()->with('error', $e->getMessage());
         }
-
-        if (!$follower->isFollowing($user)){
-            $follower->followings()->attach($user->id);
-
-            $user->notify(new UserFollowed($follower));
-        }
-
-        return back()->with('success', 'You have subscribed to the user');
-
     }
 
     public function unfollow(User $user)

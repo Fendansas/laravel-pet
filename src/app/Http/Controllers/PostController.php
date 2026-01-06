@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PostRequest;
 use App\Models\Post;
 use App\Models\PostRating;
+use App\Services\PostRatingService;
+use App\Services\PostService;
+use App\Services\TopicService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Topic;
@@ -12,47 +15,27 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 class PostController extends Controller
 {
     use AuthorizesRequests;
-    public function index(Request $request){
+    public function index(Request $request, PostService $postService, TopicService $topicService){
 
-        $topics = Topic::all();
-        $query = Post::query()->with(['user', 'topic']);
 
         $this->authorize('viewAny', Post::class);
 
-        if (!auth()->user()->hasPermission('view all posts')) {
-            $query->published();
-        }
+        $posts = $postService->getPostsForIndex($request, auth()->user());
 
-        // сортировка по постам
-        if($request->filled('topic_id')){
-            $query->where('topic_id', $request->topic_id);
-        }
+        $topics = $topicService->all();
 
-        // писк по постам
-        if ($request->filled('search')){
-            $search = $request->search;
-
-            $query->where(function($query) use ($search){
-                $query->where('title', 'like', "%{$search}%")
-                    ->orWhere('content', 'like', "%{$search}%");
-            });
-        }
-
-        $posts = $query->latest()->paginate(10)->withQueryString();
         return view('posts.index', compact('posts', 'topics'));
+
     }
 
-    public function create(){
+    public function create(TopicService $topicService){
         $this->authorize('create', Post::class);
-        $topics = Topic::all();
+        $topics = $topicService->all();
         return view('posts.create', compact('topics'));
     }
-    public function store(PostRequest $request){
+    public function store(PostRequest $request, PostService $postService){
 
-        $data= $request->validated();
-        $data['user_id'] = Auth::id();
-
-        Post::create($data);
+        $postService->create($request->validated(), Auth::id());
 
         return redirect()->route('posts.index')->with('success', 'Post created successfully.');
     }
@@ -62,17 +45,17 @@ class PostController extends Controller
         return view('posts.show', compact('post'));
     }
 
-    public function edit(Post $post){
+    public function edit(Post $post, TopicService $topicService){
 
         $this->authorize('update', $post);
 
-        $topics = Topic::all();
+        $topics = $topicService->all();
         return view('posts.edit', compact('post', 'topics'));
     }
 
-    public function update(PostRequest $request, Post $post){
+    public function update(PostRequest $request, Post $post, PostService $postService){
 
-        $post->update($request->validated());
+        $postService->update($post, $request->validated());
 
         return redirect()->route('posts.show', $post)->with('success', 'Post updated successfully.');
     }
@@ -81,32 +64,29 @@ class PostController extends Controller
 
         $this->authorize('delete', $post);
 
+        $post->delete();
+
         return redirect()->route('posts.index')->with('success', 'Пост успешно удалён.');
     }
 
-    public function rate(Request $request, Post $post){
+    public function rate(Request $request, Post $post, PostRatingService $ratingService){
         $data = $request->validate([
             'rating' => 'nullable|integer:min:0|max:5',
         ]);
 
-        PostRating::updateOrCreate(
-            ['post_id' => $post->id, 'user_id' => Auth::id()],
-            ['rating' => $data['rating']]
-        );
+        $ratingService->rate($post, Auth::id(), $data['rating']);
 
         return back()->with('success', 'Вы оценили пост');
     }
 
-    public function dashboard (Request $request){
-        $topics = Topic::all();
+    public function dashboard (Request $request, PostService $postService, TopicService $topicService){
+
+        $topics = $topicService->all();
 
         $query = Post::with('user', 'topic')->published();
 
-        if($request->filled('topic_id')){
-            $query->where('topic_id', $request->topic_id);
-        }
-
-        $posts = $query->latest()->paginate(10)->withQueryString();
+        $posts = $postService->getPostsForDashboard($request);
+        $topics = $topicService->all();
 
         return view('dashboard', compact('posts', 'topics'));
     }

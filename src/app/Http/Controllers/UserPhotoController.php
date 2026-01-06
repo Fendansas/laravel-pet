@@ -7,12 +7,18 @@ use App\Models\UserPhoto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-
+use App\Services\UserPhotoService;
 class UserPhotoController extends Controller
 {
     use AuthorizesRequests;
+
+    public function __construct(
+        protected UserPhotoService $service
+    ){}
+
     public function index(){
-        $photos = auth()->user()->photos()->latest()->get();
+        $photos = $this->service->getForAuthUser();
+
         return view('user-photos.index', compact('photos'));
     }
 
@@ -21,10 +27,7 @@ class UserPhotoController extends Controller
             'photos.*' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:4096',
         ]);
 
-        foreach($request->file('photos') as $photo){
-            $path = $photo->store('user_photo', 'public');
-            auth()->user()->photos()->create(['path' => $path]);
-        }
+        $this->service->uploadPhotos($request->file('photos'));
 
         return redirect()->back()->with('success', 'Photos successfully uploaded');
     }
@@ -33,13 +36,14 @@ class UserPhotoController extends Controller
 
         $this->authorize('delete', $userPhoto);
 
-        Storage::disk('public')->delete($userPhoto->path); //  удаляем картинку
-        $userPhoto->delete(); // удадяем запись с базы данных
+        $this->service->deletePhoto($userPhoto);
 
         return redirect()->back()->with('success', 'Photos successfully deleted');
     }
     public function show(User $user){
-        $photos = $user->photos()->latest()->get();
+
+        $photos = $this->service->getForUser($user);
+
         return view('user-photos.show', compact('photos', 'user'));
     }
 }
