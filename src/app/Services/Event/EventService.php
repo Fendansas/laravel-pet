@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Event;
 
 use App\Models\Event;
 use Illuminate\Http\Request;

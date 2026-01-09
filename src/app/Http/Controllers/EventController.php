@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Event\EventStoreRequest;
 use App\Http\Requests\Event\EventUpdateRequest;
 use App\Models\Event;
-use App\Services\EventService;
+use App\Services\Event\EventService;
 use Illuminate\Http\Request;
 
 class EventController extends Controller
