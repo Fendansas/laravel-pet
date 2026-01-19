@@ -11,9 +11,11 @@ use App\Models\Task;
 use App\Services\Event\EventResolver;
 use App\Services\Task\TaskService;
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class TaskController extends Controller
 {
+    use AuthorizesRequests;
     public function __construct(
         private TaskService $taskService,
         private EventResolver $eventResolver,
@@ -25,6 +27,7 @@ class TaskController extends Controller
      */
     public function index(Event $event)
     {
+        $this->authorize('viewAny', Task::class);
         $tasks = $this->taskService->paginateTasksForEvent($event->id);
         return view('tasks.index', compact('tasks', 'event'));
     }
@@ -34,6 +37,7 @@ class TaskController extends Controller
      */
     public function create(Request $request)
     {
+         $this->authorize('create', Task::class);
          $event = $this->eventResolver->findOrFail((int) $request->get('event_id'));
          $departments = Department::orderBy('name')->get();
          $participants = EventParticipant::orderBy('name')->get();
@@ -46,6 +50,7 @@ class TaskController extends Controller
      */
     public function store(StoreTaskRequest $request)
     {
+        $this->authorize('create', Task::class);
         $task = $this->taskService->storeTask($request->validated());
         return redirect()
             ->route('events.show', $task->event_id)
@@ -57,6 +62,7 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
+        $this->authorize('view', $task);
         $task->load(['event', 'department', 'assignedTo']);
         return view('tasks.show', compact('task'));
     }
@@ -66,6 +72,7 @@ class TaskController extends Controller
      */
     public function edit(Task $task)
     {
+        $this->authorize('update', $task);
         return view('tasks.edit', [
             'task'         => $task,
             'departments'  => Department::orderBy('name')->get(),
@@ -78,6 +85,7 @@ class TaskController extends Controller
      */
     public function update(UpdateTaskRequest $request, Task $task)
     {
+        $this->authorize('update', $task);
         $this->taskService->updateTask($task, $request->validated());
 
         return redirect()
@@ -90,6 +98,7 @@ class TaskController extends Controller
      */
     public function destroy(Task $task)
     {
+        $this->authorize('delete', $task);
         $eventId = $task->event_id;
         $this->taskService->deleteTask($task);
         return redirect()

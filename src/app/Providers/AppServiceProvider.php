@@ -3,32 +3,32 @@
 namespace App\Providers;
 
 use App\Models\Post;
+use App\Models\Task;
 use App\Models\User;
 use App\Models\UserPhoto;
 use App\Policies\PostPolicy;
+use App\Policies\TaskPolicy;
 use App\Policies\UserPolicy;
 use App\Policies\UserPhotoPolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Logout;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
         Gate::policy(UserPhoto::class, UserPhotoPolicy::class);
+        Gate::policy(Post::class, PostPolicy::class);
+        Gate::policy(Task::class, TaskPolicy::class);
+        Gate::policy(User::class, UserPolicy::class);
 
         Event::listen(Login::class, function ($event) {
             $user = $event->user;
@@ -39,34 +39,27 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Event::listen(Logout::class, function ($event) {
-            $user = $event->user;
-            if ($user) {
-                $user->last_activity_at = now();
-                $user->save();
+            if ($event->user) {
+                $event->user->update([
+                    'last_activity_at' => now(),
+                ]);
             }
         });
 
-        Gate::policy(Post::class, PostPolicy::class);
+        Gate::define('viewAny-user', fn (User $user) =>
+        $user->hasRole(['admin', 'manager'])
+        );
 
-        Gate::define('viewAny-user', function (User $authUser) {
-            return $authUser->hasRole(['admin', 'manager']);
-        });
+        Gate::define('view-user', fn (User $user, User $model) =>
+        $user->hasRole(['admin', 'manager'])
+        );
 
-        // Просмотр отдельного пользователя
-        Gate::define('view-user', function (User $authUser, User $model) {
-            return $authUser->hasRole(['admin', 'manager']);
-        });
+        Gate::define('update-user', fn (User $user, User $model) =>
+        $user->hasRole('admin')
+        );
 
-        // Редактирование (только admin)
-        Gate::define('update-user', function (User $authUser, User $model) {
-            return $authUser->hasRole('admin');
-        });
-
-        // Удаление (только admin)
-        Gate::define('delete-user', function (User $authUser, User $model) {
-            return $authUser->hasRole('admin');
-        });
-
-
+        Gate::define('delete-user', fn (User $user, User $model) =>
+        $user->hasRole('admin')
+        );
     }
 }
