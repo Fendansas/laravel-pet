@@ -17,7 +17,7 @@
                             <h3 class="font-semibold text-lg">{{ $event->name }}</h3>
                             <p class="text-gray-500">{{ $event->description }}</p>
                         </div>
-                        <a href="{{ route('events.show', $event) }}" class="text-blue-600 hover:underline">Подробнее →</a>
+                        <a href="{{ route('tasks.index', $event) }}" class="text-blue-600 hover:underline">Подробнее →</a>
                     </div>
                 </div>
             @endforeach

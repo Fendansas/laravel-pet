@@ -29,7 +29,14 @@ class TaskController extends Controller
     {
         $this->authorize('viewAny', Task::class);
         $tasks = $this->taskService->paginateTasksForEvent($event->id);
-        return view('tasks.index', compact('tasks', 'event'));
+        $participants = EventParticipant::orderBy('name')->get();
+        $departments  = Department::orderBy('name')->get();
+        return view('tasks.index', compact(
+            'tasks',
+            'event',
+            'participants',
+            'departments')
+        );
     }
 
     /**
@@ -105,4 +112,33 @@ class TaskController extends Controller
             ->route('events.show', $eventId)
             ->with('success', 'Task deleted successfully.');
     }
+
+    public function bulk(Request $request){
+        $this->authorize('updateAny', Task::class);
+
+        $this->taskService->bulkAction($request->validated());
+
+        return back()->with('success', 'Bulk action completed');
+
+    }
+
+    public function all()
+    {
+        $this->authorize('viewAny', Task::class);
+
+        $tasks = Task::with(['event', 'department', 'assignedTo'])
+            ->latest()
+            ->paginate(20);
+
+        $participants = EventParticipant::orderBy('name')->get();
+        $departments  = Department::orderBy('name')->get();
+
+        return view('tasks.all', compact(
+            'tasks',
+            'participants',
+            'departments'
+        ));
+    }
+
+
 }

@@ -20,6 +20,11 @@ class Task extends Model
         'completed_at'
     ];
 
+    protected $casts = [
+        'deadline'     => 'datetime',
+        'completed_at' => 'datetime',
+    ];
+
     public function event() {
         return $this->belongsTo(Event::class);
     }

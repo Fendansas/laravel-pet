@@ -7,9 +7,22 @@ use Illuminate\Http\Request;
 
 class EventParticipantService
 {
-    public function getParticipants(int $perPage = 10)
+    public function getParticipants(int $perPage = 10, ?string $sort = null, ?string $direction = 'desc')
     {
-        return EventParticipant::latest()->paginate($perPage);
+        $query = EventParticipant::withCount([
+            'tasks',
+            'tasks as completed_tasks_count' => function ($query) {
+                $query->where('status', 'completed');
+            }
+        ]);
+        if (in_array($sort,['tasks_count','completed_tasks_count'])) {
+            $query->orderBy($sort, $direction === 'asc' ? 'asc' : 'desc');
+        } else {
+            $query->latest();
+        }
+
+
+        return $query->paginate($perPage)->withQueryString();
     }
 
     public function createParticipant(array $data): EventParticipant

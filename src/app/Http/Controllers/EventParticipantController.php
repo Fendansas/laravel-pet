@@ -17,9 +17,14 @@ class EventParticipantController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $participants = $this->service->getParticipants();
+        $participants = $this->service->getParticipants(
+            10,
+            $request->get('sort'),
+            $request->get('direction')
+        );
+
         return view('participants.index', compact('participants'));
     }
 

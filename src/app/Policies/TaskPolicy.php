@@ -10,11 +10,7 @@ class TaskPolicy
 {
     public function before(User $user, string $ability): bool|null
     {
-        if ($user->isAdmin()) {
-            return true;
-        }
-
-        return null;
+        return $user->isAdmin() ? true : null;
     }
 
     /**
@@ -83,5 +79,10 @@ class TaskPolicy
     public function forceDelete(User $user, Task $task): bool
     {
         return $user->hasPermission('force delete tasks') || $user->isAdmin();
+    }
+
+    public function updateAny(User $user): bool
+    {
+        return $user->is_admin;
     }
 }
