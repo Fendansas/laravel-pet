@@ -132,6 +132,7 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('events', EventController::class);
+    Route::get('/tasks/chart', [TaskController::class, 'chart'])->name('tasks.chart');
     Route::get('events/{event}/tasks', [TaskController::class, 'index'])->name('tasks.index');
     Route::get('tasks/create', [TaskController::class, 'create'])->name('tasks.create');
     Route::post('tasks', [TaskController::class, 'store'])->name('tasks.store');

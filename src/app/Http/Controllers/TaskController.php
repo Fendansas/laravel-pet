@@ -9,6 +9,7 @@ use App\Models\Event;
 use App\Models\EventParticipant;
 use App\Models\Task;
 use App\Services\Event\EventResolver;
+use App\Services\Task\TaskChartService;
 use App\Services\Task\TaskService;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -16,9 +17,12 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 class TaskController extends Controller
 {
     use AuthorizesRequests;
+
+
     public function __construct(
         private TaskService $taskService,
         private EventResolver $eventResolver,
+        private TaskChartService $taskChartService,
     ) {}
 
 
@@ -138,6 +142,18 @@ class TaskController extends Controller
             'participants',
             'departments'
         ));
+    }
+
+    public function chart()
+    {
+        $this->authorize('viewAny', Task::class);
+
+        $tasksByStatus = $this->taskChartService->byStatus();
+
+        return view('tasks.chart', [
+            'labels' => $tasksByStatus->pluck('status'),
+            'data' => $tasksByStatus->pluck('total')
+        ]);
     }
 
 
