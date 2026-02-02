@@ -28,6 +28,7 @@ class UpdateTaskRequest extends FormRequest
             'assigned_to' => 'nullable|exists:event_participants,id',
             'status' => 'required|string',
             'deadline' => 'nullable|date',
+            'price' => 'required|numeric|min:0',
         ];
     }
 }

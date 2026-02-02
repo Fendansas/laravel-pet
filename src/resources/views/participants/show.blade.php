@@ -8,8 +8,8 @@
             <p><strong>Email:</strong> {{ $participant->email }}</p>
             <p><strong>Телефон:</strong> {{ $participant->phone }}</p>
             <p><strong>Должность:</strong> {{ $participant->position }}</p>
-            <p><strong>Заметки:</strong> {{ $participant->notes }}</p>
-
+            <p><strong>Счет:</strong> {{ $participant->earned_money }} рублей</p>
+            <p><strong>Заметки:</strong> {{ $participant->notes }} </p>
             <a href="{{ route('participants.index') }}" class="text-blue-600 hover:underline">← Назад</a>
         </div>
         <form method="GET" class="mb-4">

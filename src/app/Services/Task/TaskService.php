@@ -30,7 +30,19 @@ final class TaskService {
 
     public function updateTask(Task $task, array $validated): Task{
 
+        $oldStatus = $task->status;
+
         $task->update($validated);
+
+        if(
+            $oldStatus != 'completed' &&
+            $task->status === 'completed' &&
+            !$task->is_paid
+        ){
+            $this->payForTask($task);
+        }
+
+
         return $task->fresh(['event', 'department', 'assignedTo']);
     }
 
@@ -53,7 +65,17 @@ final class TaskService {
     private function bulkUpdateStatus($tasks, string $status): void
     {
         foreach ($tasks as $task) {
+            $oldStatus = $task->status;
+
             $task->update(['status' => $status]);
+
+            if (
+                $oldStatus !== 'completed'
+                && $status === 'completed'
+                && ! $task->is_paid
+            ) {
+                $this->payForTask($task);
+            }
         }
     }
 
@@ -77,6 +99,20 @@ final class TaskService {
         foreach ($tasks as $task) {
             $task->delete();
         }
+    }
+
+    private function payForTask(Task $task): void
+    {
+        if(! $task->assignedTo || $task->price <=0){
+            return;
+        }
+
+        $task->assignedTo->increment('earned_money', $task->price);
+
+        $task->update([
+            'is_paid' => true,
+            'completed_at' => now(),
+            ]);
     }
 
 }

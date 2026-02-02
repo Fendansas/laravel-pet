@@ -14,7 +14,12 @@ class EventParticipant extends Model
         'email',
         'phone',
         'position',
-        'notes'
+        'notes',
+        'earned_money'
+    ];
+
+    protected $casts = [
+        'earned_money' => 'decimal:2',
     ];
 
     public function events(){

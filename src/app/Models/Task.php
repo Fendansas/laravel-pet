@@ -17,12 +17,16 @@ class Task extends Model
         'description',
         'status',
         'deadline',
-        'completed_at'
+        'completed_at',
+        'price',
+        'is_paid',
     ];
 
     protected $casts = [
         'deadline'     => 'datetime',
         'completed_at' => 'datetime',
+        'price'        => 'decimal:2',
+        'is_paid'      => 'boolean',
     ];
 
     public function event() {

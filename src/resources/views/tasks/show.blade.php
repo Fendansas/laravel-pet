@@ -31,7 +31,9 @@
                 <p><strong>Исполнитель:</strong>
                     {{ $task->assignedTo->name ?? 'Не назначен' }}
                 </p>
-
+                <p><strong>Стоимовсть:</strong>
+                    {{ $task->price ?? 'Не назначен' }}
+                </p>
                 <p><strong>Статус:</strong>
                     <span class="px-2 py-1 text-xs bg-gray-200 rounded">
                         {{ $task->status }}

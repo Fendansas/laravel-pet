@@ -27,6 +27,7 @@ class EventParticipantUpdateRequest extends FormRequest
             'phone' => 'nullable|string',
             'position' => 'nullable|string',
             'notes' => 'nullable|string',
+            'earned_money' => 'nullable|numeric|min:0',
         ];
     }
 }

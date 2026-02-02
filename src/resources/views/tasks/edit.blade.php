@@ -18,6 +18,10 @@
                     <label class="block text-sm font-medium">Описание</label>
                     <textarea name="description" class="w-full border rounded p-2">{{ $task->description }}</textarea>
                 </div>
+                <div>
+                    <label class="block text-sm font-medium">Цена за выполнение задания</label>
+                    <input type="number" name="price" step="0.01" value="{{ $task->price }}" class="w-full border rounded p-2" required>
+                </div>
 
                 <div>
                     <label class="block text-sm font-medium">Фракция</label>
