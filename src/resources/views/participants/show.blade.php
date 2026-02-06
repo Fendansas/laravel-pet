@@ -10,6 +10,11 @@
             <p><strong>Должность:</strong> {{ $participant->position }}</p>
             <p><strong>Счет:</strong> {{ $participant->earned_money }} рублей</p>
             <p><strong>Заметки:</strong> {{ $participant->notes }} </p>
+            @if($participant->photo)
+                <img src="{{ asset('storage/' . $participant->photo) }}"
+                     class="w-40 h-40 object-cover rounded-xl mb-4">
+            @endif
+
             <a href="{{ route('participants.index') }}" class="text-blue-600 hover:underline">← Назад</a>
         </div>
         <form method="GET" class="mb-4">

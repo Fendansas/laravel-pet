@@ -26,3 +26,15 @@
     <label class="block text-sm font-medium">Заметки</label>
     <textarea name="notes" class="w-full border rounded p-2">{{ old('notes', $participant->notes ?? '') }}</textarea>
 </div>
+
+<div>
+    <label class="block text-sm font-medium">Фотография</label>
+    <input type="file" name="photo" class="w-full border rounded p-2">
+</div>
+
+@if(!empty($participant?->photo))
+    <div class="mt-2">
+        <img src="{{ asset('storage/' . $participant->photo) }}"
+             class="w-32 h-32 object-cover rounded">
+    </div>
+@endif

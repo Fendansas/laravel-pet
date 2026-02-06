@@ -27,6 +27,7 @@ class EventParticipantStoreRequest extends FormRequest
             'phone' => 'nullable|string',
             'position' => 'nullable|string',
             'notes' => 'nullable|string',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ];
     }
 }

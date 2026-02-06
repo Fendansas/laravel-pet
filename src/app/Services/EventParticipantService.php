@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\EventParticipant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class EventParticipantService
 {
@@ -27,11 +28,22 @@ class EventParticipantService
 
     public function createParticipant(array $data): EventParticipant
     {
+        if (isset($data['photo'])) {
+            $data['photo'] = $data['photo']->store('participants', 'public');
+        }
+
         return EventParticipant::create($data);
     }
 
     public function updateParticipant(EventParticipant $participant, array $data): bool
     {
+
+        if ($participant->photo){
+            Storage::disk('public')->delete($participant->photo);
+        }
+
+        $data['photo'] = $data['photo']->store('participants', 'public');
+
         return $participant->update($data);
     }
 

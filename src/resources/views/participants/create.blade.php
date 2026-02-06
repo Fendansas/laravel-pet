@@ -5,7 +5,7 @@
 
     <div class="py-6 max-w-3xl mx-auto px-4">
         <div class="bg-white p-6 rounded-xl shadow">
-            <form method="POST" action="{{ route('participants.store') }}" class="space-y-4">
+            <form method="POST" action="{{ route('participants.store') }}" enctype="multipart/form-data" class="space-y-4">
                 @csrf
 
                 @include('participants.form')

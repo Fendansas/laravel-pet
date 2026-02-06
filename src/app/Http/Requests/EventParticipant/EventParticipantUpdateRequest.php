@@ -28,6 +28,7 @@ class EventParticipantUpdateRequest extends FormRequest
             'position' => 'nullable|string',
             'notes' => 'nullable|string',
             'earned_money' => 'nullable|numeric|min:0',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ];
     }
 }

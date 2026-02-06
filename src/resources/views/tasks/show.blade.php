@@ -29,7 +29,14 @@
                 </p>
 
                 <p><strong>Исполнитель:</strong>
-                    {{ $task->assignedTo->name ?? 'Не назначен' }}
+                    @if($task->assignedTo)
+                        <a href="{{ route('participants.show', $task->assignedTo->id) }}"
+                           class="text-blue-600 hover:underline">
+                            {{ $task->assignedTo->name }}
+                        </a>
+                    @else
+                        Не назначен
+                    @endif
                 </p>
                 <p><strong>Стоимовсть:</strong>
                     {{ $task->price ?? 'Не назначен' }}

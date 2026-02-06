@@ -15,7 +15,8 @@ class EventParticipant extends Model
         'phone',
         'position',
         'notes',
-        'earned_money'
+        'earned_money',
+        'photo',
     ];
 
     protected $casts = [
