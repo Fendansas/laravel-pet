@@ -41,6 +41,9 @@
                             <x-dropdown-link :href="route('admin.permissions.index')">
                                 Права
                             </x-dropdown-link>
+                            <x-dropdown-link :href="route('items.index')">
+                                Items
+                            </x-dropdown-link>
 
                         </x-slot>
                     </x-dropdown>

@@ -29,6 +29,13 @@ class RolesAndPermissionsSeeder extends Seeder
             'publish posts',
             'view published posts',
             'view all posts',
+            // ITEMS
+            'create items',
+            'view items',
+            'edit items',
+            'delete items',
+            'restore items',
+            'force delete items',
         ];
         $labels = [
             'create posts'          => 'Create posts',
@@ -47,6 +54,13 @@ class RolesAndPermissionsSeeder extends Seeder
             'delete any tasks'     => 'Delete any tasks',
             'restore tasks'        => 'Restore tasks',
             'force delete tasks'   => 'Force delete tasks',
+            // ITEMS
+            'create items'       => 'Create items',
+            'view items'         => 'View items',
+            'edit items'         => 'Edit items',
+            'delete items'       => 'Delete items',
+            'restore items'      => 'Restore items',
+            'force delete items' => 'Force delete items',
         ];
 
         foreach ($permissions as $permName) {
@@ -66,13 +80,11 @@ class RolesAndPermissionsSeeder extends Seeder
             $perms['view tasks'],
             $perms['edit own tasks'],
             $perms['delete own tasks'],
+
+            $perms['create items'],
+            $perms['view items'],
         ]);
 
-        $user->permissions()->sync([
-            $perms['create posts'],
-            $perms['edit own posts'],
-            $perms['view published posts'],
-        ]);
         // ===== EDITOR =====
         $editor->permissions()->sync([
             $perms['edit posts'],
@@ -81,6 +93,9 @@ class RolesAndPermissionsSeeder extends Seeder
 
             $perms['view tasks'],
             $perms['edit any tasks'],
+
+            $perms['view items'],
+            $perms['edit items'],
         ]);
         // ===== MANAGER =====
         $manager->permissions()->sync([
@@ -93,6 +108,11 @@ class RolesAndPermissionsSeeder extends Seeder
             $perms['view tasks'],
             $perms['edit any tasks'],
             $perms['delete any tasks'],
+
+            $perms['create items'],
+            $perms['view items'],
+            $perms['edit items'],
+            $perms['delete items'],
         ]);
 
         // ===== ADMIN =====
@@ -106,9 +126,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'password' => Hash::make('admin'),
             ]
         );
-
-        // назначаем роль admin
-        $adminUser->roles()->syncWithoutDetaching([$admin->id]);
+        $adminUser->roles()->sync([$admin->id]);
 
     }
 }
