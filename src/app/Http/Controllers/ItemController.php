@@ -88,7 +88,7 @@ class ItemController extends Controller
     {
         $this->authorize('update', $item);
 
-        $this->itemService->update($item,$request->validated());
+        $this->itemService->update($request->validated(),$item);
 
         return redirect()->route('items.index')
             ->with('success','Item updated');
