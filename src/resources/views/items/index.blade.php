@@ -12,7 +12,17 @@
                 ➕ Добавить
             </a>
         @endcan
+        <div class="mt-6">
+            <form action="{{ route('items.import') }}" method="POST" enctype="multipart/form-data">
+                @csrf
 
+                <input type="file" name="file" required>
+
+                <button class="btn btn-primary bg-green-600 text-white px-4 py-2 rounded">
+                    Импорт Excel
+                </button>
+            </form>
+        </div>
         <div class="grid grid-cols-3 gap-4 mt-6">
 
             @foreach($items as $item)

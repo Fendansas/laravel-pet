@@ -9,6 +9,9 @@ use App\Models\Item;
 use App\Services\Item\ItemService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use App\Imports\ItemsImport;
+use Maatwebsite\Excel\Facades\Excel;
+
 
 class ItemController extends Controller
 {
@@ -104,5 +107,12 @@ class ItemController extends Controller
         $this->itemService->delete($item);
 
         return back()->with('success','Item deleted');
+    }
+
+    public function import()
+    {
+        Excel::queueImport(new ItemsImport(), request()->file('file'));
+
+        return back()->with('success','Items imported successfully');
     }
 }

@@ -197,5 +197,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('items/{item}', [ItemController::class, 'destroy'])
         ->name('items.destroy');
 });
+Route::post('/items/import', [ItemController::class, 'import'])->name('items.import');
 
 require __DIR__.'/auth.php';
