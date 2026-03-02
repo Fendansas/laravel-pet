@@ -7,6 +7,7 @@ use App\Models\Post;
 use App\Models\Task;
 use App\Models\User;
 use App\Models\UserPhoto;
+use App\Policies\EventPolicy;
 use App\Policies\ItemPolicy;
 use App\Policies\PostPolicy;
 use App\Policies\TaskPolicy;
@@ -32,6 +33,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Task::class, TaskPolicy::class);
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(Item::class, ItemPolicy::class);
+        Gate::policy(Event::class, EventPolicy::class);
 
         Event::listen(Login::class, function ($event) {
             $user = $event->user;

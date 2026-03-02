@@ -16,10 +16,10 @@ class RolesAndPermissionsSeeder extends Seeder
      */
     public function run(): void
     {
-        $admin = Role::create(['name'=>'admin', 'label'=>'Admin', 'description'=>'Super admin']);
-        $manager = Role::create(['name'=>'manager', 'label'=>'Manager']);
-        $editor = Role::create(['name'=>'editor', 'label'=>'Editor']);
-        $user = Role::create(['name'=>'user', 'label'=>'User']);
+        $admin = Role::firstOrCreate(['name'=>'admin', 'label'=>'Admin', 'description'=>'Super admin']);
+        $manager = Role::firstOrCreate(['name'=>'manager', 'label'=>'Manager']);
+        $editor = Role::firstOrCreate(['name'=>'editor', 'label'=>'Editor']);
+        $user = Role::firstOrCreate(['name'=>'user', 'label'=>'User']);
 
         $permissions = [
             'create posts',
@@ -29,6 +29,15 @@ class RolesAndPermissionsSeeder extends Seeder
             'publish posts',
             'view published posts',
             'view all posts',
+            // TASKS
+            'create tasks',
+            'view tasks',
+            'edit own tasks',
+            'edit any tasks',
+            'delete own tasks',
+            'delete any tasks',
+            'restore tasks',
+            'force delete tasks',
             // ITEMS
             'create items',
             'view items',
@@ -36,6 +45,11 @@ class RolesAndPermissionsSeeder extends Seeder
             'delete items',
             'restore items',
             'force delete items',
+            // EVENTS
+            'create events',
+            'view events',
+            'edit events',
+            'delete events',
         ];
         $labels = [
             'create posts'          => 'Create posts',
@@ -61,10 +75,15 @@ class RolesAndPermissionsSeeder extends Seeder
             'delete items'       => 'Delete items',
             'restore items'      => 'Restore items',
             'force delete items' => 'Force delete items',
+            // EVENTS
+            'create events' => 'Create events',
+            'view events'   => 'View events',
+            'edit events'   => 'Edit events',
+            'delete events' => 'Delete events',
         ];
 
         foreach ($permissions as $permName) {
-            Permission::create([
+            Permission::firstOrCreate([
                 'name' => $permName,
                 'label' => $labels[$permName]?? $permName]);
         }
@@ -83,6 +102,8 @@ class RolesAndPermissionsSeeder extends Seeder
 
             $perms['create items'],
             $perms['view items'],
+
+            $perms['view events'],
         ]);
 
         // ===== EDITOR =====
@@ -96,6 +117,9 @@ class RolesAndPermissionsSeeder extends Seeder
 
             $perms['view items'],
             $perms['edit items'],
+
+            $perms['view events'],
+            $perms['edit events'],
         ]);
         // ===== MANAGER =====
         $manager->permissions()->sync([
@@ -113,6 +137,10 @@ class RolesAndPermissionsSeeder extends Seeder
             $perms['view items'],
             $perms['edit items'],
             $perms['delete items'],
+
+            $perms['create events'],
+            $perms['view events'],
+            $perms['edit events'],
         ]);
 
         // ===== ADMIN =====

@@ -96,17 +96,18 @@ class User extends Authenticatable implements MustVerifyEmail
     }
  // Роли и доступы
 
-    public function can($permissions, $arguments = [])
-    {
-        return $this->hasPermission($permissions);
-    }
+//    public function can($permissions, $arguments = [])
+//    {
+//        return $this->hasPermission($permissions);
+//    }
 
     public function isAdmin(): bool
     {
-        $adminEmails = ['admin@example.com', 'your-email@gmail.com'];
-        $adminIds = [1];
-
-        return in_array($this->email, $adminEmails) || in_array($this->id, $adminIds);
+//        $adminEmails = ['admin@example.com', 'your-email@gmail.com'];
+//        $adminIds = [1];
+//
+//        return in_array($this->email, $adminEmails) || in_array($this->id, $adminIds);
+        return $this->hasRole('admin');
     }
 
     protected function getPermissions(): array

@@ -147,3 +147,7 @@ crontab -e
 ```bash
     docker compose up -d
 ```
+- ЗАпуск работы очреди
+```bash
+    docker compose run --rm app php artisan queue:work
+```
