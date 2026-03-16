@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Item\StoreItemRequest;
 use App\Http\Requests\Item\UpdateItemRequest;
+use App\Jobs\ExportItemsJob;
 use App\Models\Department;
 use App\Models\Item;
 use App\Services\Item\ItemService;
@@ -114,5 +115,23 @@ class ItemController extends Controller
         Excel::queueImport(new ItemsImport(), request()->file('file'));
 
         return back()->with('success','Items imported successfully');
+    }
+
+    public function export()
+    {
+        ExportItemsJob::dispatch(auth()->user());
+        return back()->with('success','Экспорт запущен. Файл придет на email.');
+    }
+
+    public function download($file)
+    {
+
+        $path = storage_path('app/'.$file);
+
+        if(!file_exists($path)){
+            abort(404);
+        }
+
+        return response()->download($path);
     }
 }

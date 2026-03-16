@@ -22,7 +22,15 @@
                     Импорт Excel
                 </button>
             </form>
+
+            <a href="{{ route('items.export') }}"
+               class="bg-blue-600 text-white px-4 py-2 rounded">
+                Экспорт Excel
+            </a>
         </div>
+
+
+
         <div class="grid grid-cols-3 gap-4 mt-6">
 
             @foreach($items as $item)

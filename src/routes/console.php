@@ -9,3 +9,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('app:publish-scheduled-posts')->everyMinute();
+Schedule::command('clean:exports')->daily();
